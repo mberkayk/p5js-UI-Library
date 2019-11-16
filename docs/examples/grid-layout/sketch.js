@@ -6,7 +6,7 @@ let grid;
 let p0, p1, p2, p3; // panel 0 to 3
 
 function setup(){
-  size(600, 600);
+  createCanvas(600, 600);
 
   mainPanel = new Panel(0, 0, width, height);
   mainPanel.setTitle('Main Panel');
@@ -22,7 +22,7 @@ function setup(){
   p2.setTitle('Third Panel');
   p3.setTitle('Fourth Panel');
 
-  p0.addItem(new Label('LABEL', 40, 40, 100, 30));
+  p0.addItem(new Label('LABEL', 150, 150, 100, 30));
 
   grid.addItem(p0, 0, 0);
   grid.addItem(p1, 1, 0);
@@ -32,6 +32,10 @@ function setup(){
 }
 
 function draw(){
+  background(125);
   mainPanel.display();
+}
 
+function windowResized(){
+  mainPanel.resizeEvent(width, height);
 }
