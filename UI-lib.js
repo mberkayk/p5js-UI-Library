@@ -43,7 +43,7 @@ class Label extends Component {
     super(x, y, w, h);
 
     this.bg;
-    this.textSize = 14;
+    this.textSize;
     this.textColor = color(0);
     this.text = text;
   }
@@ -58,9 +58,16 @@ class Label extends Component {
       rect(0, 0, this.width, this.height)
     }
     fill(this.textColor);
+    if(this.textSize == undefined){
+      this.textSize = this.height;
+    }
     textSize(this.textSize);
     textAlign(LEFT, TOP);
-    text(this.text, this.x, this.y);
+    text(this.text, this.x, this.y + 4);
+    stroke(0);
+    strokeWeight(1);
+    noFill();
+    rect(this.x, this.y, this.width, this.height);
   }
 
 }
