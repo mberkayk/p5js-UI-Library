@@ -63,7 +63,7 @@ class Label extends Component {
     }
     textSize(this.textSize);
     textAlign(LEFT, TOP);
-    text(this.text, this.x, this.y + 4);
+    text(this.text, this.x, this.y + 1);
     stroke(0);
     strokeWeight(1);
     noFill();
