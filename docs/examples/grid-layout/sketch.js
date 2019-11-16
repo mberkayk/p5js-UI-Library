@@ -29,6 +29,6 @@ function setup(){
 }
 
 function draw(){
-
+  mainPanel.display();
 
 }
