@@ -95,7 +95,6 @@ class GridLayout extends Layout {
     this.compsGridAtts = [];
 
     this.padding = 0;
-
   }
 
   addItem(c, x, y, w, h) { // Component, GridX, GridY, horizontal span, vertical span
