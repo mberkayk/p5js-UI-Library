@@ -232,7 +232,11 @@ class GridLayout extends Layout {
     if(this.showBorders == true){
       //FOR EMPTY CELLS
       for(let i = 0; i < this.numberOfCells; i++){
+<<<<<<< HEAD
         if(this.cells[i] == false){ // if the cell is empty
+=======
+        if(cells[i] == false){ // if the cell is empty
+>>>>>>> 50b5fd185c6a5bb6703140b02b939bd356c2eee8
           strokeWeight(1);
           stroke(0);
           noFill();
