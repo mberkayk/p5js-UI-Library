@@ -22,6 +22,8 @@ function setup(){
   p2.setTitle('Third Panel');
   p3.setTitle('Fourth Panel');
 
+  p0.addItem(new Label('LABEL', 40, 40, 100, 30));
+
   grid.addItem(p0, 0, 0);
   grid.addItem(p1, 1, 0);
   grid.addItem(p2, 0, 1);

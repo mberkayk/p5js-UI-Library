@@ -37,6 +37,33 @@ class Component {
 
 }
 
+class Label extends Component {
+
+  constructor(text, x, y, w, h){
+    super(x, y, w, h);
+
+    this.bg;
+    this.textSize = 14;
+    this.textColor = color(0);
+    this.text = text;
+  }
+
+  setText(t){
+    this.text = text;
+  }
+
+  display(){
+    if(this.bgColor != undefined){
+      fill(this.bgColor);
+      rect(0, 0, this.width, this.height)
+    }
+    fill(this.textColor);
+    textSize(this.textSize);
+    textAlign(LEFT, TOP);
+    text(this.text, this.x, this.y);
+  }
+
+}
 
 class Container extends Component {
 
@@ -59,6 +86,7 @@ class Container extends Component {
 
 }
 
+
 class Layout extends Container {
 
   constructor(parent){
@@ -74,6 +102,7 @@ class Layout extends Container {
   }
 
 }
+
 
 class GridLayout extends Layout {
 
