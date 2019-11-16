@@ -9,6 +9,7 @@ function setup(){
   size(600, 600);
 
   mainPanel = new Panel(0, 0, width, height);
+  mainPanel.setTitle('Main Panel');
   grid = new GridLayout(mainPanel, 2, 2);
 
   p0 = new Panel();
