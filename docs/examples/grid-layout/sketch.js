@@ -29,6 +29,8 @@ function setup(){
   grid.addItem(p2, 0, 1);
   grid.addItem(p3, 1, 1);
 
+  grid.showBorders = true;
+
 }
 
 function draw(){
