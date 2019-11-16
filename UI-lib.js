@@ -244,7 +244,7 @@ class Panel extends Container {
     super.display();
 
     if(this.titleBar.title != undefined){
-      fill(255);
+      fill(0);
       textSize(this.width / 30);
       text(this.titleBar.title, this.x + this.width/3, this.y + this.titleBar.height/3);
     }
