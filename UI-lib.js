@@ -130,7 +130,10 @@ class GridLayout extends Layout {
 //  compsGridIndex[a]=index of the grid cell component is in. a = component's index in comps array)
     this.compsGridAtts = [];
 
+    this.margin = 0;
     this.padding = 0;
+
+    this.showBorders = true;
   }
 
   addItem(c, x, y, w, h) { // Component, GridX, GridY, horizontal span, vertical span
@@ -171,7 +174,7 @@ class GridLayout extends Layout {
       let area = w*h; // Area of the component in the grid
       if(stack.length == area){ // if all the required cells are empty
         for(let i = 0; i < area; i++){
-          this.cells[stack.pop()] = true; //occupied
+          this.cells[stack.pop()] = true; //occupy the cells
         }
         available = true;
       }
@@ -214,13 +217,52 @@ class GridLayout extends Layout {
   }// end of resizeEvent
 
   calculateGridSize(){
-    this.gridWidth = this.width / this.columns;
-    this.gridHeight = this.height / this.rows;
+    this.gridWidth = (this.width / this.columns) - this.margin * (this.columns - 1);
+    this.gridHeight = (this.height / this.rows) - this.margin * (this.rows - 1);
   }
 
   setPadding(p){
     this.padding = p;
     this.resizeEvent(this.width, this.height);
+  }
+
+  display(){
+    super.display();
+
+    if(this.showBorders == true){
+      //FOR EMPTY CELLS
+      for(let i = 0; i < this.numberOfCells; i++){
+        if(cells[i] == false){ // if the cell is empty
+          strokeWeight(1);
+          stroke(0);
+          noFill();
+          //screen x
+          let sx = this.compsGridAtts.x * this.margin + this.compsGridAtts.x * this.gridWidth;
+          //screen y
+          let sy = this.compsGridAtts.y * this.margin + this.compsGridAtts.y * this.gridHeight;
+          rect(sx, sy, this.gridWidth, this.gridHeight);
+        }
+      }
+
+      //FOR OCCUPIED cells
+      for(let i = 0; i < this.itemCount; i++){
+        //screen x
+        let sx = (this.compsGridAtts.x * this.margin) + this.compsGridAtts.x * this.gridWidth;
+        //screen y
+        let sy = (this.compsGridAtts.y * this.margin) + this.compsGridAtts.y * this.gridHeight;
+
+        let w = this.margin * (this.compsGridAtts[i].hSpan-1) +
+            (this.gridWidth * this.compsGridAtts[i].hSpan);
+        let h = this.margin * (this.compsGridAtts[i].vSpan-1) +
+            (this.gridHeight * this.compsGridAtts[i].vSpan);
+
+        stroke(0);
+        strokeWeight(1);
+        noFill();
+        rect(sx, sy, w, h);
+      }
+    }
+
   }
 
   mousePressed(x, y){
