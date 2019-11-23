@@ -2,22 +2,15 @@ class Component {
 
   constructor(x, y, w, h){
 
-    if(arguments.length == 0){
-      this.x = 0;
-      this.y = 0;
-      this.width = 0;
-      this.height = 0;
-    }else if(arguments.length == 2){
-      this.x = x;
-      this.y = y;
-      this.width = 0;
-      this.height = 0;
-    }else if (arguments.length == 4){
-      this.x = x;
-      this.y = y;
-      this.width = w;
-      this.height = h;
-    }
+    if(x == undefined) x = 0;
+    if(y == undefined) y = 0;
+    if(w == undefined) w = 10;
+    if(h == undefined) h = 10;
+
+    this.g = createGraphics(w, h);
+
+    this.setPos(x, y);
+    this.setSize(w, h);
 
   }
 
@@ -31,7 +24,13 @@ class Component {
     this.height = h;
   }
 
-  display(){}
+  render(){}
+
+  resizeEvent(w, h){
+    this.setSize(w, h);
+    this.g = createGraphics(this.width, this.height);
+    this.render();
+  }
 
   mousePressed(x, y){}
 
@@ -42,34 +41,42 @@ class Label extends Component {
   constructor(text, x, y, w, h){
     super(x, y, w, h);
 
-    this.bg;
+    this.bgColor;
     this.textSize;
     this.textColor = color(0);
     this.text = text;
   }
 
   setText(t){
-    this.text = text;
+    this.text = t;
   }
 
-  display(){
+  render(){
+    //Background
     if(this.bgColor != undefined){
-      fill(this.bgColor);
-      rect(0, 0, this.width, this.height)
+      this.g.fill(this.bgColor);
+      this.g.rect(0, 0, this.width, this.height)
     }
-    fill(this.textColor);
+    //Text
+    this.g.fill(this.textColor);
     if(this.textSize == undefined){
       this.textSize = this.height;
     }
-    textSize(this.textSize);
-    textAlign(LEFT, TOP);
-    text(this.text, this.x, this.y + 1);
-    stroke(0);
-    strokeWeight(1);
-    noFill();
-    rect(this.x, this.y, this.width, this.height);
+    this.g.textSize(this.textSize);
+    this.g.textAlign(LEFT, TOP);
+    this.g.text(this.text, 2, 2);
+    //Borders
+    this.g.stroke(0);
+    this.g.strokeWeight(1);
+    this.g.noFill();
+    this.g.rect(0, 0, this.width, this.height);
+
+    return this.g;
   }
 
+  setBackground(color){
+    this.bgColor = color;
+  }
 }
 
 class Container extends Component {
@@ -80,19 +87,18 @@ class Container extends Component {
     this.itemCount = 0;
   }
 
-  display(){
+  render() {
     for(let i = 0; i < this.itemCount; i++){
-      this.comps[i].display();
+      this.g.image(this.comps[i].render(), this.comps[i].x, this.comps[i].y);
     }
   }
 
   addItem(item){
     this.itemCount++;
-    this.comps = this.comps.concat(item);
+    this.comps.push(item);
   }
 
 }
-
 
 class Layout extends Container {
 
@@ -104,12 +110,44 @@ class Layout extends Container {
 
   }
 
-  display(){
-    super.display();
+  render(){
+    super.render();
   }
 
 }
 
+class ListLayout extends Layout {
+
+  constructor(parent){
+    super(parent);
+    this.dirEnum = {down:1, left:2, right: 3, up: 4};
+    this.direction = this.dirEnum.down;
+  }
+
+  addItem(item){
+    super.addItem(item);
+    this.calculatePosition();
+  }
+
+  calculatePosition(){
+    let centerX = this.width/2;
+    let centerY = this.height/2;
+
+    for(let i = 0; i < this.itemCount; i++){
+      let x =  centerX - this.comps[i].width/2;
+      let y = 20 + i*(20+this.height/this.itemCount);
+      this.comps[i].setPos(x, y);
+      print('pos:' + x + ' ' + y);
+    }
+  }
+
+  render(){
+    super.render();
+
+    return this.g;
+  }
+
+}
 
 class GridLayout extends Layout {
 
@@ -125,8 +163,6 @@ class GridLayout extends Layout {
       this.cells.push(false); //Empty
     }
 
-    this.calculateGridSize();
-
 //  compsGridIndex[a]=index of the grid cell component is in. a = component's index in comps array)
     this.compsGridAtts = [];
 
@@ -134,11 +170,13 @@ class GridLayout extends Layout {
     this.padding = 0;
 
     this.showBorders = true;
+
+    this.calculateGridSize();
   }
 
   addItem(c, x, y, w, h) { // Component, GridX, GridY, horizontal span, vertical span
 
-    let index = y * this.columns + x; // index = which grid cell the x,y denotes
+    let index = y * this.columns + x; // index = which index the x,y denotes in the "cells" array
     let available = false; // if the required cells are empty
 
     if (arguments.length == 3) {
@@ -182,14 +220,17 @@ class GridLayout extends Layout {
     } // end of (else if length == 5)
 
     if(available){
-      let cx = this.x + x * this.gridWidth; //component x (screen x)
-      let cy = this.y + y * this.gridHeight; //component y (screen y)
-      c.setPos(cx, cy);
-      c.resizeEvent(this.gridWidth * w, this.gridHeight * h);
-      super.addItem(c);
 
       if(h == undefined) h = 1;
       if(w == undefined) w = 1;
+
+      let cx = this.margin + (this.margin * 2 * x) + x * this.gridWidth; // component x
+      let cy = this.margin + (this.margin * 2 * y) + y * this.gridHeight; //component y
+      c.setPos(cx + this.padding, cy * this.padding);
+      c.resizeEvent((this.margin * 2 * w) + (this.gridWidth * w) - this.padding*2,
+                    (this.margin * 2 * h) + this.gridHeight * h) - this.padding*2;
+      super.addItem(c);
+
       this.compsGridAtts.push({cellIndex: index, gridX: x, gridY: y, hSpan: w, vSpan: h});
 
     }
@@ -201,24 +242,30 @@ class GridLayout extends Layout {
   }
 
   resizeEvent(w, h){
-    this.setPos(this.parent.x, this.parent.y);
     this.setSize(w, h);
     this.calculateGridSize();
 
     for(let i = 0; i < this.itemCount; i++){
-      this.comps[i].setPos(this.x + this.padding + this.compsGridAtts[i].gridX * this.gridWidth,
-                  this.y + this.padding + this.compsGridAtts[i].gridY * this.gridHeight);
+      let xMarginOffset = this.margin + (this.margin*2*this.compsGridAtts[i].gridX);
+      let yMarginOffset = this.margin + (this.margin*2*this.compsGridAtts[i].gridY);
+      this.comps[i].setPos(this.padding + xMarginOffset + (this.compsGridAtts[i].gridX * this.gridWidth),
+                  this.padding + yMarginOffset + (this.compsGridAtts[i].gridY * this.gridHeight));
 
       this.comps[i].resizeEvent((this.gridWidth * this.compsGridAtts[i].hSpan) - 2 * this.padding,
            (this.gridHeight * this.compsGridAtts[i].vSpan) - 2 * this.padding);
 
     }//end of for loop
 
-  }// end of resizeEvent
+  }// end of resizeEvent()
 
   calculateGridSize(){
-    this.gridWidth = (this.width / this.columns) - this.margin * (this.columns - 1);
-    this.gridHeight = (this.height / this.rows) - this.margin * (this.rows - 1);
+    this.gridWidth = (this.width / this.columns) -  this.columns * this.margin * 2;
+    this.gridHeight = (this.height / this.rows) - this.rows * this.margin * 2;
+  }
+
+  setMargin(m){
+    this.margin = m;
+    this.calculateGridSize();
   }
 
   setPadding(p){
@@ -226,47 +273,52 @@ class GridLayout extends Layout {
     this.resizeEvent(this.width, this.height);
   }
 
-  display(){
-    super.display();
+  render(){
+    super.render();
 
+    //display borders
     if(this.showBorders == true){
       //FOR EMPTY CELLS
       for(let i = 0; i < this.numberOfCells; i++){
-<<<<<<< HEAD
         if(this.cells[i] == false){ // if the cell is empty
-=======
-        if(cells[i] == false){ // if the cell is empty
->>>>>>> 50b5fd185c6a5bb6703140b02b939bd356c2eee8
-          strokeWeight(1);
-          stroke(0);
-          noFill();
-          //screen x
-          let sx = this.compsGridAtts.x * this.margin + this.compsGridAtts.x * this.gridWidth;
-          //screen y
-          let sy = this.compsGridAtts.y * this.margin + this.compsGridAtts.y * this.gridHeight;
-          rect(sx, sy, this.gridWidth, this.gridHeight);
+          this.g.strokeWeight(1.5);
+          this.g.stroke(0);
+          this.g.noFill();
+          // gridX and gridY values of the cell that has the 'i'th index in "cells[]"
+          let gridX = i % this.columns;
+          let gridY = floor(i / this.columns);
+          // x and y values in this.g graphics object
+          let x = this.margin + (this.margin * gridX * 2) + (gridX * this.gridWidth);
+          let y = this.margin + (this.margin * gridY * 2) + (gridY * this.gridHeight);
+          this.g.rect(x, y, this.gridWidth, this.gridHeight);
         }
       }
 
       //FOR OCCUPIED cells
       for(let i = 0; i < this.itemCount; i++){
-        //screen x
-        let sx = (this.compsGridAtts.x * this.margin) + this.compsGridAtts.x * this.gridWidth;
-        //screen y
-        let sy = (this.compsGridAtts.y * this.margin) + this.compsGridAtts.y * this.gridHeight;
 
-        let w = this.margin * (this.compsGridAtts[i].hSpan-1) +
-            (this.gridWidth * this.compsGridAtts[i].hSpan);
-        let h = this.margin * (this.compsGridAtts[i].vSpan-1) +
-            (this.gridHeight * this.compsGridAtts[i].vSpan);
+        //x and y values in this.g graphics object
+        let x = this.margin + (this.margin * this.compsGridAtts[i].gridX * 2) +
+              (this.compsGridAtts[i].gridX * this.gridWidth);
+        let y = this.margin + (this.margin * this.compsGridAtts[i].gridY * 2) +
+                (this.compsGridAtts[i].gridY * this.gridHeight);
 
-        stroke(0);
-        strokeWeight(1);
-        noFill();
-        rect(sx, sy, w, h);
+        // width and the height of the border rectamgle
+        let w =  (this.padding * 2 * this.compsGridAtts[i].hSpan) +
+         (this.compsGridAtts[i].hSpan * this.gridWidth);
+        let h = (this.padding * 2 * this.compsGridAtts[i].vSpan) +
+         (this.compsGridAtts[i].vSpan * this.gridHeight);
+
+        this.g.stroke(0);
+        this.g.strokeWeight(1);
+        this.g.noFill();
+        this.g.rect(x, y, w, h);
+
       }
+
     }
 
+    return this.g;
   }
 
   mousePressed(x, y){
@@ -284,26 +336,39 @@ class GridLayout extends Layout {
 }
 
 
-class Panel extends Container {
+class Panel extends Component {
 
   constructor(x, y, w, h){
     super(x, y, w, h);
 
     this.layout;
-    this.titleBar = {minimumHeight:30};
+    this.bgColor;
+    this.titleBar = {minimumHeight:30, height:50};
+
+    new ListLayout(this);
   }
 
-  display(){
-    super.display();
+  render(){
+
+    if(this.bgColor != undefined){
+      //this.g.background(this.bgColor);
+      this.g.noStroke();
+      this.g.fill(this.bgColor);
+      this.g.rect(0, 0, this.width, this.height);
+    }
 
     if(this.titleBar.title != undefined){
-      fill(0);
-      textSize(this.width / 30);
-      text(this.titleBar.title, this.x + this.width/3, this.y + this.titleBar.height/3);
+      this.g.fill(0);
+      this.g.textSize(this.width / 30);
+      this.g.textAlign(LEFT, TOP);
+      this.g.text(this.titleBar.title, this.x + this.width/3, this.y + this.titleBar.height/3);
     }
+
     if(this.layout != undefined){
-      this.layout.display();
+      this.g.image(this.layout.render(), this.layout.x, this.layout.y);
     }
+
+    return this.g;
   }
 
   setLayout(layout){
@@ -311,7 +376,7 @@ class Panel extends Container {
   }
 
   resizeEvent(w, h){
-    this.setSize(w, h);
+    super.resizeEvent(w, h);
     if(this.layout != undefined){
 
       if(this.titleBar.height == undefined){
@@ -324,6 +389,10 @@ class Panel extends Container {
 
   }
 
+  addItem(item){
+    this.layout.addItem(item);
+  }
+
   setTitle(title){
      this.titleBar.title = title;
      if(this.height < this.titleBar.minimumHeight * 3.5){
@@ -331,6 +400,11 @@ class Panel extends Container {
      }else{
        this.titleBar.height = 20;
      }
+     this.layout.setPos(this.layout.x, this.titleBar.height);
+   }
+
+  setBackground(color){
+     this.bgColor = color;
    }
 
   mousePressed(x, y){
