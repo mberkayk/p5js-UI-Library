@@ -7,8 +7,6 @@ class Component {
     if(w == undefined) w = 10;
     if(h == undefined) h = 10;
 
-    this.g = createGraphics(w, h);
-
     this.setPos(x, y);
     this.setSize(w, h);
 
@@ -24,12 +22,10 @@ class Component {
     this.height = h;
   }
 
-  render(){}
+  render(g){}
 
   resizeEvent(w, h){
     this.setSize(w, h);
-    this.g = createGraphics(this.width, this.height);
-    this.render();
   }
 
   mousePressed(x, y){}
@@ -51,27 +47,26 @@ class Label extends Component {
     this.text = t;
   }
 
-  render(){
+  render(g){
     //Background
     if(this.bgColor != undefined){
-      this.g.fill(this.bgColor);
-      this.g.rect(0, 0, this.width, this.height)
+      g.fill(this.bgColor);
+      g.rect(this.x, this.y, this.width, this.height)
     }
     //Text
-    this.g.fill(this.textColor);
+    g.fill(this.textColor);
     if(this.textSize == undefined){
       this.textSize = this.height;
     }
-    this.g.textSize(this.textSize);
-    this.g.textAlign(LEFT, TOP);
-    this.g.text(this.text, 2, 2);
+    g.textSize(this.textSize);
+    g.textAlign(LEFT, TOP);
+    g.text(this.text, this.x + 2, this.y + 2);
     //Borders
-    this.g.stroke(0);
-    this.g.strokeWeight(1);
-    this.g.noFill();
-    this.g.rect(0, 0, this.width, this.height);
+    g.stroke(0);
+    g.strokeWeight(1);
+    g.noFill();
+    g.rect(this.x, this.y, this.width, this.height);
 
-    return this.g;
   }
 
   setBackground(color){
@@ -85,12 +80,16 @@ class Container extends Component {
     super(x, y, w, h);
     this.comps = [];
     this.itemCount = 0;
+
+    this.g = createGraphics(this.width, this.height);
   }
 
-  render() {
-    for(let i = 0; i < this.itemCount; i++){
-      this.g.image(this.comps[i].render(), this.comps[i].x, this.comps[i].y);
+  render(g) {
+    for(const comp of this.comps){
+      comp.render(this.g);
     }
+
+    g.image(this.g, this.x, this.y);
   }
 
   addItem(item){
@@ -110,18 +109,19 @@ class Layout extends Container {
 
   }
 
-  render(){
-    super.render();
+  render(g){
+    super.render(g);
   }
 
 }
 
-class ListLayout extends Layout {
+class VListLayout extends Layout {
 
   constructor(parent){
     super(parent);
-    this.dirEnum = {down:1, left:2, right: 3, up: 4};
-    this.direction = this.dirEnum.down;
+
+    this.spacing = 20;
+    this.nextItemY = this.spacing;
   }
 
   addItem(item){
@@ -130,21 +130,17 @@ class ListLayout extends Layout {
   }
 
   calculatePosition(){
-    let centerX = this.width/2;
-    let centerY = this.height/2;
-
+    this.nextItemY = this.spacing;
     for(let i = 0; i < this.itemCount; i++){
-      let x =  centerX - this.comps[i].width/2;
-      let y = 20 + i*(20+this.height/this.itemCount);
-      this.comps[i].setPos(x, y);
-      print('pos:' + x + ' ' + y);
+      let c = this.comps[i];
+      c.setPos(this.width/2 - c.width/2, this.nextItemY);
+      this.nextItemY += c.height + this.spacing;
     }
+
   }
 
-  render(){
-    super.render();
-
-    return this.g;
+  render(g){
+    super.render(g);
   }
 
 }
@@ -273,24 +269,24 @@ class GridLayout extends Layout {
     this.resizeEvent(this.width, this.height);
   }
 
-  render(){
-    super.render();
+  render(g){
+    super.render(g);
 
     //display borders
     if(this.showBorders == true){
       //FOR EMPTY CELLS
       for(let i = 0; i < this.numberOfCells; i++){
         if(this.cells[i] == false){ // if the cell is empty
-          this.g.strokeWeight(1.5);
-          this.g.stroke(0);
-          this.g.noFill();
+          g.strokeWeight(1.5);
+          g.stroke(0);
+          g.noFill();
           // gridX and gridY values of the cell that has the 'i'th index in "cells[]"
           let gridX = i % this.columns;
           let gridY = floor(i / this.columns);
           // x and y values in this.g graphics object
-          let x = this.margin + (this.margin * gridX * 2) + (gridX * this.gridWidth);
-          let y = this.margin + (this.margin * gridY * 2) + (gridY * this.gridHeight);
-          this.g.rect(x, y, this.gridWidth, this.gridHeight);
+          let x = this.x + this.margin + (this.margin * gridX * 2) + (gridX * this.gridWidth);
+          let y = this.y + this.margin + (this.margin * gridY * 2) + (gridY * this.gridHeight);
+          g.rect(x, y, this.gridWidth, this.gridHeight);
         }
       }
 
@@ -298,9 +294,9 @@ class GridLayout extends Layout {
       for(let i = 0; i < this.itemCount; i++){
 
         //x and y values in this.g graphics object
-        let x = this.margin + (this.margin * this.compsGridAtts[i].gridX * 2) +
+        let x = this.x + this.margin + (this.margin * this.compsGridAtts[i].gridX * 2) +
               (this.compsGridAtts[i].gridX * this.gridWidth);
-        let y = this.margin + (this.margin * this.compsGridAtts[i].gridY * 2) +
+        let y = this.y + this.margin + (this.margin * this.compsGridAtts[i].gridY * 2) +
                 (this.compsGridAtts[i].gridY * this.gridHeight);
 
         // width and the height of the border rectamgle
@@ -309,16 +305,15 @@ class GridLayout extends Layout {
         let h = (this.padding * 2 * this.compsGridAtts[i].vSpan) +
          (this.compsGridAtts[i].vSpan * this.gridHeight);
 
-        this.g.stroke(0);
-        this.g.strokeWeight(1);
-        this.g.noFill();
-        this.g.rect(x, y, w, h);
+        g.stroke(0);
+        g.strokeWeight(1);
+        g.noFill();
+        g.rect(x, y, w, h);
 
       }
 
     }
 
-    return this.g;
   }
 
   mousePressed(x, y){
@@ -345,30 +340,27 @@ class Panel extends Component {
     this.bgColor;
     this.titleBar = {minimumHeight:30, height:50};
 
-    new ListLayout(this);
+    new VListLayout(this);
   }
 
-  render(){
+  render(g){
 
     if(this.bgColor != undefined){
       //this.g.background(this.bgColor);
-      this.g.noStroke();
-      this.g.fill(this.bgColor);
-      this.g.rect(0, 0, this.width, this.height);
+      g.noStroke();
+      g.fill(this.bgColor);
+      g.rect(this.x, this.y, this.width, this.height);
     }
 
     if(this.titleBar.title != undefined){
-      this.g.fill(0);
-      this.g.textSize(this.width / 30);
-      this.g.textAlign(LEFT, TOP);
-      this.g.text(this.titleBar.title, this.x + this.width/3, this.y + this.titleBar.height/3);
+      g.fill(255);
+      g.textSize(this.width / 30);
+      g.textAlign(LEFT, TOP);
+      g.text(this.titleBar.title, this.x + this.width/3, this.y + this.titleBar.height/3);
     }
 
-    if(this.layout != undefined){
-      this.g.image(this.layout.render(), this.layout.x, this.layout.y);
-    }
+    this.layout.render(g);
 
-    return this.g;
   }
 
   setLayout(layout){
@@ -377,14 +369,11 @@ class Panel extends Component {
 
   resizeEvent(w, h){
     super.resizeEvent(w, h);
-    if(this.layout != undefined){
 
-      if(this.titleBar.height == undefined){
-        this.layout.resizeEvent(w,h);
-      }else{
-        this.layout.resizeEvent(w, h-this.titleBar.height);
-      }
-
+    if(this.titleBar.height == undefined){
+      this.layout.resizeEvent(w,h);
+    }else{
+      this.layout.resizeEvent(w, h-this.titleBar.height);
     }
 
   }
