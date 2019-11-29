@@ -253,9 +253,16 @@ class GridLayout extends Layout {
     for(let i = 0; i < this.itemCount; i++){
       let xMarginOffset = this.margin + (this.margin*2*this.compsGridAtts[i].gridX);
       let yMarginOffset = this.margin + (this.margin*2*this.compsGridAtts[i].gridY);
-      this.comps[i].setPos(this.padding + xMarginOffset + (this.compsGridAtts[i].gridX * this.gridWidth),
-                  this.padding + yMarginOffset + (this.compsGridAtts[i].gridY * this.gridHeight));
 
+      let xGridOffset = this.compsGridAtts[i].gridX * this.gridWidth;
+      let yGridOffset = this.compsGridAtts[i].gridY * this.gridHeight;
+
+      this.comps[i].setPos(this.padding + xMarginOffset + xGridOffset,
+                  this.padding + yMarginOffset + yGridOffset);
+
+
+      // WARNING: This won't work for components with hspan or vspan higher than 1
+      // because it does NOT account for margin
       this.comps[i].resizeEvent((this.gridWidth * this.compsGridAtts[i].hSpan) - 2 * this.padding,
            (this.gridHeight * this.compsGridAtts[i].vSpan) - 2 * this.padding);
 
