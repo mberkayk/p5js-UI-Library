@@ -260,11 +260,11 @@ class GridLayout extends Layout {
       this.comps[i].setPos(this.padding + xMarginOffset + xGridOffset,
                   this.padding + yMarginOffset + yGridOffset);
 
+      let hSpan = this.compsGridAtts[i].hSpan;
+      let vSpan = this.compsGridAtts[i].vSpan;
 
-      // WARNING: This won't work for components with hspan or vspan higher than 1
-      // because it does NOT account for margin
-      this.comps[i].resizeEvent((this.gridWidth * this.compsGridAtts[i].hSpan) - 2 * this.padding,
-           (this.gridHeight * this.compsGridAtts[i].vSpan) - 2 * this.padding);
+      this.comps[i].resizeEvent((this.gridWidth * hSpan) - 2*this.padding + (hSpan-1)*2*this.margin,
+           (this.gridHeight * vSpan) - 2*this.padding + (vSpan-1)*2*this.margin);
 
     }//end of for loop
 
