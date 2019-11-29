@@ -25,22 +25,27 @@ function setup(){
   p1.setTitle('Second Panel');
   p2.setTitle('Third Panel');
   p3.setTitle('Fourth Panel');
+  
   p0.setBackground(color(200,120,0));
   p1.setBackground(color(255));
   p2.setBackground(color(125, 200, 40));
   p3.setBackground(color(90, 120, 210));
-
-  p0.addItem(new Label('LABEL', 15, 15, 100, 30));
-  p0.addItem(new Label('second', 100, 10, 150, 30));
 
   grid.addItem(p0, 0, 0);
   grid.addItem(p1, 1, 0);
   grid.addItem(p2, 0, 1);
   grid.addItem(p3, 1, 1);
 
+  p0.addItem(new Label(p0.titleBar.height, 35, 15, 100, 30));
+  p0.addItem(new Label(p1.titleBar.height, 15, 15, 100, 30));
+  p0.addItem(new Label(p2.titleBar.height, 20, 20, 100, 30));
+  p0.addItem(new Label(p3.titleBar.height, 15, 60, 100, 30));
+
   grid.setMargin(5);
   //grid.setPadding(5);
 
+  //mainPanel.addItem(p0);
+  //mainPanel.addItem(p1);
 
   mainPanel.setBackground(color(30, 30, 40));
 

@@ -80,21 +80,22 @@ class Container extends Component {
     super(x, y, w, h);
     this.comps = [];
     this.itemCount = 0;
-
-    this.g = createGraphics(this.width, this.height);
   }
 
   render(g) {
     for(const comp of this.comps){
-      comp.render(this.g);
+      comp.render(g);
     }
-
-    g.image(this.g, this.x, this.y);
   }
 
   addItem(item){
     this.itemCount++;
     this.comps.push(item);
+  }
+
+  resizeEvent(w, h){
+    super.resizeEvent(w,h);
+    this.g = createGraphics(w, h);
   }
 
 }
@@ -111,6 +112,10 @@ class Layout extends Container {
 
   render(g){
     super.render(g);
+  }
+
+  resizeEvent(w, h){
+    super.resizeEvent(w, h);
   }
 
 }
@@ -131,8 +136,7 @@ class VListLayout extends Layout {
 
   calculatePosition(){
     this.nextItemY = this.spacing;
-    for(let i = 0; i < this.itemCount; i++){
-      let c = this.comps[i];
+    for(const c of this.comps){
       c.setPos(this.width/2 - c.width/2, this.nextItemY);
       this.nextItemY += c.height + this.spacing;
     }
@@ -141,6 +145,11 @@ class VListLayout extends Layout {
 
   render(g){
     super.render(g);
+  }
+
+  resizeEvent(w, h){
+    super.resizeEvent(w, h);
+    this.calculatePosition();
   }
 
 }
@@ -270,7 +279,6 @@ class GridLayout extends Layout {
   }
 
   render(g){
-    super.render(g);
 
     //display borders
     if(this.showBorders == true){
@@ -284,8 +292,8 @@ class GridLayout extends Layout {
           let gridX = i % this.columns;
           let gridY = floor(i / this.columns);
           // x and y values in this.g graphics object
-          let x = this.x + this.margin + (this.margin * gridX * 2) + (gridX * this.gridWidth);
-          let y = this.y + this.margin + (this.margin * gridY * 2) + (gridY * this.gridHeight);
+          let x = this.margin + (this.margin * gridX * 2) + (gridX * this.gridWidth);
+          let y = this.margin + (this.margin * gridY * 2) + (gridY * this.gridHeight);
           g.rect(x, y, this.gridWidth, this.gridHeight);
         }
       }
@@ -294,9 +302,9 @@ class GridLayout extends Layout {
       for(let i = 0; i < this.itemCount; i++){
 
         //x and y values in this.g graphics object
-        let x = this.x + this.margin + (this.margin * this.compsGridAtts[i].gridX * 2) +
+        let x = this.margin + (this.margin * this.compsGridAtts[i].gridX * 2) +
               (this.compsGridAtts[i].gridX * this.gridWidth);
-        let y = this.y + this.margin + (this.margin * this.compsGridAtts[i].gridY * 2) +
+        let y = this.margin + (this.margin * this.compsGridAtts[i].gridY * 2) +
                 (this.compsGridAtts[i].gridY * this.gridHeight);
 
         // width and the height of the border rectamgle
@@ -313,6 +321,8 @@ class GridLayout extends Layout {
       }
 
     }
+
+    super.render(g);
 
   }
 
@@ -340,6 +350,8 @@ class Panel extends Component {
     this.bgColor;
     this.titleBar = {minimumHeight:30, height:50};
 
+    this.g = createGraphics(this.width, this.height);
+
     new VListLayout(this);
   }
 
@@ -347,19 +359,29 @@ class Panel extends Component {
 
     if(this.bgColor != undefined){
       //this.g.background(this.bgColor);
-      g.noStroke();
-      g.fill(this.bgColor);
-      g.rect(this.x, this.y, this.width, this.height);
+      this.g.noStroke();
+      this.g.fill(this.bgColor);
+      this.g.rect(0, 0, this.width, this.height);
     }
 
     if(this.titleBar.title != undefined){
-      g.fill(255);
-      g.textSize(this.width / 30);
-      g.textAlign(LEFT, TOP);
-      g.text(this.titleBar.title, this.x + this.width/3, this.y + this.titleBar.height/3);
+      this.g.fill(125);
+      this.g.rect(0, 0, this.width, this.titleBar.height);
+
+      this.g.fill(0);
+      this.g.textSize(this.width / 30);
+      this.g.textAlign(CENTER, TOP);
+      this.g.text(this.titleBar.title, this.width/2, this.titleBar.height/5);
+
+      this.g.push();
+      this.g.translate(this.layout.x, this.layout.y);
+      this.layout.render(this.g);
+      this.g.pop();
+    }else {
+      this.layout.render(this.g);
     }
 
-    this.layout.render(g);
+    g.image(this.g, this.x, this.y);
 
   }
 
@@ -369,6 +391,8 @@ class Panel extends Component {
 
   resizeEvent(w, h){
     super.resizeEvent(w, h);
+
+    this.g = createGraphics(w, h);
 
     if(this.titleBar.height == undefined){
       this.layout.resizeEvent(w,h);
@@ -384,7 +408,7 @@ class Panel extends Component {
 
   setTitle(title){
      this.titleBar.title = title;
-     if(this.height < this.titleBar.minimumHeight * 3.5){
+     if(this.height < this.titleBar.minimumHeight * 9){
        this.titleBar.height = this.titleBar.minimumHeight;
      }else{
        this.titleBar.height = 20;
