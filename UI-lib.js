@@ -369,23 +369,36 @@ class Panel extends Component {
       //this.g.background(this.bgColor);
       this.g.noStroke();
       this.g.fill(this.bgColor);
-      this.g.rect(0, 0, this.width, this.height);
+      if(this.titleBar.title != undefined){
+        this.g.rect(0, this.titleBar.height, this.width, this.height);
+      }else{
+        this.g.rect(0, 0, this.width, this.height);
+      }
     }
 
     if(this.titleBar.title != undefined){
-      this.g.fill(125);
-      this.g.rect(0, 0, this.width, this.titleBar.height);
+      //Bar background
+      this.g.fill(170);
+      this.g.rect(0, 0, this.width, this.titleBar.height, 20, 20, 0, 0);
 
+      //Bar outline
+      this.g.noFill();
+      this.g.stroke(100);
+      this.g.rect(0, 0, this.width, this.titleBar.height-1, 20, 20, 0, 0);
+      this.g.stroke(50);
+      this.g.line(0, this.titleBar.height, this.width, this.titleBar.height);
+      //Text
       this.g.fill(0);
       this.g.textSize(this.width / 30);
       this.g.textAlign(CENTER, TOP);
       this.g.text(this.titleBar.title, this.width/2, this.titleBar.height/5);
 
+      //contents
       this.g.push();
       this.g.translate(this.layout.x, this.layout.y);
       this.layout.render(this.g);
       this.g.pop();
-    }else {
+    }else{ // If there isn't a title bar
       this.layout.render(this.g);
     }
 
