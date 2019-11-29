@@ -271,6 +271,7 @@ class GridLayout extends Layout {
   }// end of resizeEvent()
 
   calculateGridSize(){
+    //These include padding
     this.gridWidth = (this.width / this.columns) -  this.columns * this.margin * 2;
     this.gridHeight = (this.height / this.rows) - this.rows * this.margin * 2;
   }
