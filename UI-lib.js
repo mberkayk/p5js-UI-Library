@@ -340,7 +340,6 @@ class GridLayout extends Layout {
 
 }
 
-
 class Panel extends Component {
 
   constructor(x, y, w, h){
