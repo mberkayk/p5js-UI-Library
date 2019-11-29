@@ -315,11 +315,12 @@ class GridLayout extends Layout {
         let y = this.margin + (this.margin * this.compsGridAtts[i].gridY * 2) +
                 (this.compsGridAtts[i].gridY * this.gridHeight);
 
-        // width and the height of the border rectamgle
-        let w =  (this.padding * 2 * this.compsGridAtts[i].hSpan) +
-         (this.compsGridAtts[i].hSpan * this.gridWidth);
-        let h = (this.padding * 2 * this.compsGridAtts[i].vSpan) +
-         (this.compsGridAtts[i].vSpan * this.gridHeight);
+        // width and the height of the border rectangle
+        let hSpan = this.compsGridAtts[i].hSpan;
+        let vSpan = this.compsGridAtts[i].vSpan;
+
+        let w = hSpan * this.gridWidth + this.margin * 2 * (hSpan - 1);
+        let h = vSpan * this.gridHeight + this.margin * 2 * (vSpan - 1);
 
         g.stroke(0);
         g.strokeWeight(1);
