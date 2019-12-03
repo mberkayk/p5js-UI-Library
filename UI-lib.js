@@ -154,6 +154,40 @@ class VListLayout extends Layout {
 
 }
 
+class HListLayout extends Layout {
+
+  constructor(parent){
+    super(parent);
+
+    this.spacing = 20;
+    this.nextItemX = this.spacing;
+  }
+
+  addItem(item){
+    super.addItem(item);
+    this.calculatePosition();
+  }
+
+  calculatePosition(){
+    this.nextItemX = this.spacing;
+    for(const c of this.comps){
+      c.setPos(this.nextItemX, this.height/2 - c.height/2);
+      this.nextItemX += c.width + this.spacing;
+    }
+
+  }
+
+  render(g){
+    super.render(g);
+  }
+
+  resizeEvent(w, h){
+    super.resizeEvent(w, h);
+    this.calculatePosition();
+  }
+
+}
+
 class GridLayout extends Layout {
 
   constructor(parent, c, r) { //Parent Component, columns, rows
