@@ -34,11 +34,13 @@ class Component {
 
 class Label extends Component {
 
-  constructor(text, x, y, w, h){
-    super(x, y, w, h);
+  constructor(text, x, y, tSize){
+    textSize(tSize);
+    let str = String(text);
+    super(x, y, textWidth(str) * 1.1, textAscent() + textDescent());
 
-    this.bgColor;
-    this.textSize = h;
+    this.bgColor = color(0, 0, 0, 0);
+    this.textSize = tSize;
     this.textColor = color(0);
     this.text = text;
   }
@@ -57,8 +59,17 @@ class Label extends Component {
     //Text
     g.fill(this.textColor);
     g.textSize(this.textSize);
-    g.textAlign(LEFT, TOP);
-    g.text(this.text, this.x + 2, this.y + 2);
+    g.textAlign(CENTER, CENTER);
+    g.text(this.text, this.x + this.width/2, this.y + this.height/2);
+    g.stroke(color(255, 40, 40));
+    g.strokeWeight(2);
+    g.textSize(this.textSize);
+    let a =  textAscent();
+    let d = textDescent();
+    a = 0;
+    d = 0;
+    //g.line(this.x, this.y + this.height/2 - a, this.x + this.width, this.y + this.height/2 - a);
+    //g.line(this.x, this.y + this.height/2 + d, this.x + this.width, this.y + this.height/2 + d);
 
     //Borders
     g.stroke(0);

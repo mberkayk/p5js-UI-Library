@@ -11,6 +11,7 @@ let hlayout;
 
 function setup(){
   createCanvas(600, 600);
+  noLoop();
 
   gr = createGraphics(600, 600);
 
@@ -24,8 +25,8 @@ function setup(){
 
   //hlayout = new HListLayout(p2);
 
-  p2.addItem(new Label('second label', 0, 0, 150, 40));
-  p2.addItem(new Label('asdf', 0, 0, 150, 30));
+  p2.addItem(new Label('second label', 0, 0, 40));
+  p2.addItem(new Label('asdf', 0, 0, 30));
 
   p0.setTitle('First Panel');
   p1.setTitle('Second Panel');
@@ -39,10 +40,10 @@ function setup(){
   grid.addItem(p1, 2, 0);
   grid.addItem(p2, 0, 1, 3, 1);
 
-  p0.addItem(new Label(p0.titleBar.height, 35, 15, 100, 30));
-  p0.addItem(new Label(p1.titleBar.height, 15, 15, 100, 30));
-  p0.addItem(new Label(p2.titleBar.height, 20, 20, 100, 30));
-  p0.addItem(new Label('hey', 0, 0, 100, 30));
+  p0.addItem(new Label(p0.titleBar.height, 35, 15, 30));
+  p0.addItem(new Label(p1.titleBar.height, 15, 15, 30));
+  p0.addItem(new Label(p2.titleBar.height, 20, 20, 30));
+  p0.addItem(new Label('hey', 0, 0, 15));
 
   grid.setMargin(15);
   grid.setPadding(10);
