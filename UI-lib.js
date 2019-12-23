@@ -38,7 +38,7 @@ class Label extends Component {
     super(x, y, w, h);
 
     this.bgColor;
-    this.textSize;
+    this.textSize = h;
     this.textColor = color(0);
     this.text = text;
   }
@@ -53,14 +53,13 @@ class Label extends Component {
       g.fill(this.bgColor);
       g.rect(this.x, this.y, this.width, this.height)
     }
+
     //Text
     g.fill(this.textColor);
-    if(this.textSize == undefined){
-      this.textSize = this.height;
-    }
     g.textSize(this.textSize);
     g.textAlign(LEFT, TOP);
     g.text(this.text, this.x + 2, this.y + 2);
+
     //Borders
     g.stroke(0);
     g.strokeWeight(1);
@@ -72,6 +71,12 @@ class Label extends Component {
   setBackground(color){
     this.bgColor = color;
   }
+
+  resizeEvent(w, h){
+    super.resizeEvent(w, h);
+    this.textSize = h;
+  }
+
 }
 
 class Container extends Component {
