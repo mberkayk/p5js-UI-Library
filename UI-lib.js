@@ -90,6 +90,59 @@ class Label extends Component {
 
 }
 
+class Button extends Component {
+  constructor(x, y, w, h, text){
+    super(x, y, w, h);
+
+    this.text = text;
+
+    colorMode(HSB);
+    this.color = color(200, 80, 80);
+    colorMode(RGB);
+
+    this.pressing = false;
+    this.hovering = false;
+
+    this.on_press = function(){};
+    this.on_hover = function(){};
+    this.on_release = function(){};
+  }
+
+  render(g){
+
+    colorMode(HSB);
+    let c;
+    if(this.pressing){
+      let b = brightness(this.color) * 0.9 - 3;
+      let s = saturation(this.color) * 1;
+      c = color(hue(this.color), s, b);
+    }else if (this.hovering){
+      let b = brightness(this.color) * 1.1 + 5;
+      let s = saturation(this.color) * 1;
+      c = color(hue(this.color), s, b);
+    }else {
+      c = this.color;
+    }
+    fill(c);
+    rect(this.x, this.y, this.width, this.height);
+    colorMode(RGB);
+
+    textSize(20);
+    fill(0);
+    textAlign(CENTER, CENTER);
+    text(this.text, this.x + this.width/2, this.y + this.height/2);
+  }
+
+  mouseEvent(){
+    this.on_press();
+  }
+
+  setPos(x, y){
+    super.setPos(x, y);
+  }
+
+}
+
 class Container extends Component {
 
   constructor(x, y, w, h){
