@@ -1,5 +1,3 @@
-
-
 let mainPanel;
 let grid;
 
@@ -19,9 +17,9 @@ function setup(){
   grid = new GridLayout(mainPanel, 3, 2);
   mainPanel.setTitle('Main Panel');
 
-  p0 = new Panel(0, 0, 300, 300);
-  p1 = new Panel(0, 0, 200, 200);
-  p2 = new Panel(0, 0, 30, 30);
+  p0 = new Panel(300, 300);
+  p1 = new Panel(200, 200);
+  p2 = new Panel(30, 30);
 
   //hlayout = new HListLayout(p2);
 
@@ -43,7 +41,7 @@ function setup(){
   p0.addItem(new Label(p0.titleBar.height, 30));
   p0.addItem(new Label(p1.titleBar.height, 30));
   p0.addItem(new Label(p2.titleBar.height, 30));
-  p0.addItem(new Label('hey', 0, 0, 15));
+  p0.addItem(new Label('hey', 15));
 
   grid.setMargin(15);
   grid.setPadding(10);

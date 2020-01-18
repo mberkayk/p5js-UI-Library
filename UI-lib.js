@@ -28,18 +28,21 @@ class Component {
     this.setSize(w, h);
   }
 
-  mousePressed(x, y){}
+  mouseMoved(){}
+  mouseDragged(){}
+  mousePressed(){}
+  mouseReleased(){}
+  keyPressed(){}
+  keyReleased(){}
 
 }
 
 class Label extends Component {
 
   constructor(text, tSize){
-	let x = 0;
-	let y = 0;
     textSize(tSize);
     let str = String(text);
-    super(x, y, textWidth(str) * 1.1, textAscent() + textDescent());
+    super(0, 0, textWidth(str) * 1.1, textAscent() + textDescent());
 
     this.bgColor = color(0, 0, 0, 0);
     this.textSize = tSize;
@@ -456,8 +459,8 @@ class GridLayout extends Layout {
 
 class Panel extends Component {
 
-  constructor(x, y, w, h){
-    super(x, y, w, h);
+  constructor(w, h){
+    super(0, 0, w, h);
 
     this.layout;
     this.bgColor;
@@ -551,5 +554,43 @@ class Panel extends Component {
        this.layout.mousePressed(x, y);
      }
    }
+
+}
+
+class MainPanel extends Panel {
+
+	constructor(w, h){
+		super(w, h);
+
+		this.preMousePressed = false;
+	}
+
+	loop(){
+
+		if(mouseX != pmouseX || mouseY != pmouseY){
+			for(let c of this.layout.comps){
+				c.mouseMoved();
+			}
+		}
+		if(movedX != 0 || movedY != 0){ // mouse dragged
+			for(let c of this.layout.comps){
+				c.mouseDragged();
+			}
+		}
+		if(mouseIsPressed && !this.preMousePressed){
+			for(let c of this.layout.comps){
+				c.mousePressed();
+			}
+		}
+		if(!mouseIsPressed && this.preMousePressed){
+			for(let c of this.layout.comps){
+				c.mouseReleased();
+			}
+		}
+		if(keyIsPressed){
+
+		}
+	}
+
 
 }

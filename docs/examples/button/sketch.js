@@ -38,5 +38,5 @@ function draw(){
 }
 
 function printThings(){
-  print("Hallelujah!");
+  print("things!");
 }
