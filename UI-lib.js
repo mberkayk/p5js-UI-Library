@@ -34,7 +34,9 @@ class Component {
 
 class Label extends Component {
 
-  constructor(text, x, y, tSize){
+  constructor(text, tSize){
+	let x = 0;
+	let y = 0;
     textSize(tSize);
     let str = String(text);
     super(x, y, textWidth(str) * 1.1, textAscent() + textDescent());
