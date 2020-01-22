@@ -111,7 +111,7 @@ class Button extends Component {
 
 	render(g) {
 
-		colorMode(HSB);
+		g.colorMode(HSB);
 		let c;
 		if(this.pressing) {
 			let b = brightness(this.color) * 0.9 - 3;
@@ -124,14 +124,18 @@ class Button extends Component {
 		} else {
 			c = this.color;
 		}
-		fill(c);
-		rect(this.x, this.y, this.width, this.height);
-		colorMode(RGB);
 
-		textSize(this.textSize);
-		fill(0);
-		textAlign(CENTER, CENTER);
-		text(this.text, this.x + this.width / 2, this.y + this.height / 2);
+		g.stroke(0);
+		g.strokeWeight(1);
+		g.fill(c);
+		g.rect(this.x, this.y, this.width, this.height);
+		g.colorMode(RGB);
+
+		g.noStroke();
+		g.textSize(this.textSize);
+		g.fill(0);
+		g.textAlign(CENTER, CENTER);
+		g.text(this.text, this.x + this.width / 2, this.y + this.height / 2);
 	}
 
 	mousePressed(x, y) {

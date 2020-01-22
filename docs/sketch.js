@@ -12,7 +12,7 @@ function setup() {
 
 	gr = createGraphics(600, 600);
 
-	mainPanel = new MainPanel(0, 0, width, height);
+	mainPanel = new MainPanel(width, height);
 	grid = new GridLayout(mainPanel, 3, 2);
 	mainPanel.setTitle('Main Panel');
 
