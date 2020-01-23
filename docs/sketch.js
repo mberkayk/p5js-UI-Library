@@ -15,7 +15,7 @@ function setup() {
 
 	mainPanel = new MainPanel(width, height);
 	grid = new GridLayout(mainPanel, 3, 2);
-	mainPanel.setTitle('Main Panel');
+	mainPanel.setTitle('Main Panel (With Grid Layout)');
 
 	p0 = new Panel(300, 300);
 	p1 = new Panel(200, 200);
@@ -34,15 +34,15 @@ function setup() {
 	p0.addItem(new Label('hey', 15));
 
 	p1.layout.setPadding(0, 50);
-	p1.addItem(new Label('This panel doesn\'t \n have a title bar'));
+	p1.addItem(new Label('This panel\ndoesn\'t have a\ntitle bar'));
 
 	let p2layout = new HListLayout(p2);
 
 	let p2panel0 = new Panel(250, 200);
 	let p2panel1 = new Panel(250, 200);
 
-	p2panel0.setTitle('panel 1');
-	p2panel1.setTitle('panel 2');
+	p2panel0.setTitle('Nested Panel 1');
+	p2panel1.setTitle('Nested Panel 2');
 
 	p2panel0.addItem(new Label('label 1', 15));
 	let btn0 = new Button('button 1', 15);
