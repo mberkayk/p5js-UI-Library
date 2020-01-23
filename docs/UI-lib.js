@@ -203,31 +203,18 @@ class Layout extends Container {
 
 }
 
-class VListLayout extends Layout {
-
+class ListLayout extends Layout {
 	constructor(parent) {
 		super(parent);
 
-		this.spacing = 20;
-		this.nextItemY = this.spacing;
+		this.xPadding = 20;
+		this.yPadding = 20;
+		this.nextItemPos = [this.xPadding, this.yPadding];
 	}
 
 	addItem(item) {
 		super.addItem(item);
 		this.calculatePosition();
-	}
-
-	calculatePosition() {
-		this.nextItemY = this.spacing;
-		for(const c of this.comps) {
-			c.setPos(this.width / 2 - c.width / 2, this.nextItemY);
-			this.nextItemY += c.height + this.spacing;
-		}
-
-	}
-
-	render(g) {
-		super.render(g);
 	}
 
 	resizeEvent(w, h) {
@@ -235,33 +222,47 @@ class VListLayout extends Layout {
 		this.calculatePosition();
 	}
 
+	setPadding(x, y){
+		this.xPadding = x;
+		this.yPadding = y;
+		this.calculatePosition();
+	}
 }
 
-class HListLayout extends Layout {
+class VListLayout extends ListLayout {
 
 	constructor(parent) {
 		super(parent);
+	}
 
-		this.spacing = 20;
-		this.nextItemX = this.spacing;
+	calculatePosition() {
+		this.nextItemPos[1] = this.yPadding;
+		for(const c of this.comps) {
+			c.setPos(this.width / 2 - c.width / 2, this.nextItemPos[1]);
+			this.nextItemPos[1] += c.height + this.yPadding;
+		}
+
 	}
 
 	addItem(item) {
 		super.addItem(item);
 		this.calculatePosition();
 	}
+}
 
-	calculatePosition() {
-		this.nextItemX = this.spacing;
-		for(const c of this.comps) {
-			c.setPos(this.nextItemX, this.height / 2 - c.height / 2);
-			this.nextItemX += c.width + this.spacing;
-		}
+class HListLayout extends ListLayout {
 
+	constructor(parent) {
+		super(parent);
 	}
 
-	render(g) {
-		super.render(g);
+	calculatePosition() {
+		this.nextItemPos[0] = this.xPadding;
+		for(const c of this.comps) {
+			c.setPos(this.nextItemPos[0], this.height / 2 - c.height / 2);
+			this.nextItemPos[0] += c.width + this.xPadding;
+		}
+
 	}
 
 	resizeEvent(w, h) {
@@ -486,7 +487,7 @@ class Panel extends Component {
 
 		this.g = createGraphics(this.width, this.height);
 
-		this.layout = new VListLayout(this);
+		new VListLayout(this);
 	}
 
 	render(g) {
