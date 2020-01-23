@@ -34,7 +34,7 @@ function setup() {
 	p0.addItem(new Label('hey', 15));
 
 	p1.layout.setPadding(0, 50);
-	p1.addItem(new Label('This panel\ndoesn\'t have a\ntitle bar'));
+	p1.addItem(new Label('This panel\ndoesn\'t have a\ntitle bar', 15));
 
 	let p2layout = new HListLayout(p2);
 
