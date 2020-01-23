@@ -41,9 +41,11 @@ class Component {
 class Label extends Component {
 
 	constructor(text, tSize) {
+		super();
+
 		textSize(tSize);
-		let str = String(text);
-		super(0, 0, textWidth(str) * 1.1, textAscent() + textDescent());
+		let size = this.calculateSize(text, tSize);
+		this.setSize(size[0], size[1]);
 
 		this.bgColor = color(0, 0, 0, 0);
 		this.textSize = tSize;
@@ -51,8 +53,27 @@ class Label extends Component {
 		this.text = text;
 	}
 
+	calculateSize(text, tSize){
+		textSize(tSize);
+
+		let lines = splitTokens(String(text), '\n');
+
+		let width = 0;
+		for(let line of lines){
+			let lineWidth = textWidth(line);
+			if(width < lineWidth){
+				width = lineWidth;
+			}
+
+		}
+		let height = (textAscent() + textDescent()) * lines.length;
+
+		return [width * 1.1, height];
+	}
+
 	setText(t) {
 		this.text = t;
+		this.calculateSize(this.text, this.textSize);
 	}
 
 	render(g) {

@@ -21,9 +21,8 @@ function setup() {
 	p1 = new Panel(200, 200);
 	p2 = new Panel(30, 30);
 
-	p0.setTitle('First Panel');
-	p1.setTitle('Second Panel');
-	p2.setTitle('Third Panel');
+	p0.setTitle('Panel With Vertical List Layout');
+	p2.setTitle('Panel With Horizontal List Layout');
 
 	p0.setBackground(color(200, 120, 0));
 	p1.setBackground(color(255));
@@ -33,6 +32,9 @@ function setup() {
 	p0.addItem(new Label(p1.titleBar.height, 30));
 	p0.addItem(new Label(p2.titleBar.height, 30));
 	p0.addItem(new Label('hey', 15));
+
+	p1.layout.setPadding(0, 50);
+	p1.addItem(new Label('This panel doesn\'t \n have a title bar'));
 
 	let p2layout = new HListLayout(p2);
 
