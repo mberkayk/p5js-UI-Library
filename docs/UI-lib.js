@@ -313,7 +313,11 @@ class GridLayout extends Layout {
 		this.margin = 0;
 		this.padding = 0;
 
-		this.showBorders = true;
+		this.border = {
+			show: true,
+			color: color(0),
+			thickness: 1.25
+		};
 
 		this.calculateGridSize();
 	}
@@ -434,12 +438,12 @@ class GridLayout extends Layout {
 	render(g) {
 
 		//display borders
-		if(this.showBorders == true) {
+		if(this.border.show == true) {
 			//FOR EMPTY CELLS
 			for(let i = 0; i < this.numberOfCells; i++) {
 				if(this.cells[i] == false) { // if the cell is empty
-					g.strokeWeight(1.5);
-					g.stroke(0);
+					g.strokeWeight(this.border.thickness);
+					g.stroke(this.border.color);
 					g.noFill();
 					// gridX and gridY values of the cell that has the 'i'th index in "cells[]"
 					let gridX = i % this.columns;
@@ -467,8 +471,8 @@ class GridLayout extends Layout {
 				let w = hSpan * this.gridWidth + this.margin * 2 * (hSpan - 1);
 				let h = vSpan * this.gridHeight + this.margin * 2 * (vSpan - 1);
 
-				g.stroke(0);
-				g.strokeWeight(1);
+				g.stroke(this.border.color);
+				g.strokeWeight(this.border.thickness);
 				g.noFill();
 				g.rect(x, y, w, h);
 
@@ -500,10 +504,11 @@ class Panel extends Component {
 		super(0, 0, w, h);
 
 		this.layout;
-		this.bgColor;
+		this.bgColor = color(225);
 		this.titleBar = {
+			exists: false,
 			minimumHeight: 30,
-			height: 50
+			height: 50,
 		};
 
 		this.g = createGraphics(this.width, this.height);
@@ -513,18 +518,20 @@ class Panel extends Component {
 
 	render(g) {
 
-		if(this.bgColor != undefined) {
-			//this.g.background(this.bgColor);
-			this.g.noStroke();
-			this.g.fill(this.bgColor);
-			if(this.titleBar.title != undefined) {
-				this.g.rect(0, this.titleBar.height, this.width, this.height);
-			} else {
-				this.g.rect(0, 0, this.width, this.height);
-			}
-		}
+		//Background
+		this.g.noStroke();
+		this.g.fill(this.bgColor);
+		this.g.rect(0, this.layout.y, this.width, this.height);
 
-		if(this.titleBar.title != undefined) {
+		//Outline
+		this.g.noFill();
+		this.g.stroke(50);
+		this.g.strokeWeight(1);
+		this.g.rect(0, this.layout.y, this.width, this.height-this.layout.y);
+
+
+		// Title Bar and Contents
+		if(this.titleBar.exists) {
 			//Bar background
 			this.g.fill(170);
 			this.g.rect(0, 0, this.width, this.titleBar.height, 20, 20, 0, 0);
@@ -532,6 +539,7 @@ class Panel extends Component {
 			//Bar outline
 			this.g.noFill();
 			this.g.stroke(100);
+			this.g.strokeWeight(1);
 			this.g.rect(0, 0, this.width, this.titleBar.height - 1, 20, 20, 0, 0);
 			this.g.stroke(50);
 			this.g.line(0, this.titleBar.height, this.width, this.titleBar.height);
@@ -540,15 +548,13 @@ class Panel extends Component {
 			this.g.textSize(this.width / 30);
 			this.g.textAlign(CENTER, TOP);
 			this.g.text(this.titleBar.title, this.width / 2, this.titleBar.height / 5);
-
-			//contents
-			this.g.push();
-			this.g.translate(this.layout.x, this.layout.y);
-			this.layout.render(this.g);
-			this.g.pop();
-		} else { // If there isn't a title bar
-			this.layout.render(this.g);
 		}
+
+		//Contents
+		this.g.push();
+		this.g.translate(this.layout.x, this.layout.y);
+		this.layout.render(this.g);
+		this.g.pop();
 
 		g.image(this.g, this.x, this.y);
 
@@ -570,7 +576,7 @@ class Panel extends Component {
 
 		this.g = createGraphics(w, h);
 
-		if(this.titleBar.height == undefined) {
+		if(this.titleBar.exists == false || this.titleBar.height == undefined) {
 			this.layout.resizeEvent(w, h);
 		} else {
 			this.layout.resizeEvent(w, h - this.titleBar.height);
@@ -583,12 +589,17 @@ class Panel extends Component {
 	}
 
 	setTitle(title) {
+		this.titleBar.exists = true;
+		if(title == '') this.titleBar.exists = false;
+
 		this.titleBar.title = title;
+
 		if(this.height < this.titleBar.minimumHeight * 9) {
 			this.titleBar.height = this.titleBar.minimumHeight;
 		} else {
 			this.titleBar.height = 20;
 		}
+
 		this.layout.setPos(this.layout.x, this.titleBar.height);
 	}
 

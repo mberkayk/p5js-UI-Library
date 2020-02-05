@@ -24,14 +24,9 @@ function setup() {
 	p0.setTitle('Panel With Vertical List Layout');
 	p2.setTitle('Panel With Horizontal List Layout');
 
-	p0.setBackground(color(200, 120, 0));
-	p1.setBackground(color(255));
-	p2.setBackground(color(125, 200, 40));
-
 	p0.addItem(new Label(p0.titleBar.height, 30));
 	p0.addItem(new Label(p1.titleBar.height, 30));
 	p0.addItem(new Label(p2.titleBar.height, 30));
-	p0.addItem(new Label('hey', 15));
 
 	p1.layout.setPadding(0, 50);
 	p1.addItem(new Label('This panel\ndoesn\'t have a\ntitle bar', 15));
@@ -42,21 +37,18 @@ function setup() {
 	let p2panel1 = new Panel(250, 200);
 
 	p2panel0.setTitle('Nested Panel 1');
-	p2panel1.setTitle('Nested Panel 2');
 
 	p2panel0.addItem(new Label('label 1', 15));
+
 	let btn0 = new Button('button 1', 15);
 	btn0.on_press = btn0Press;
 	p2panel0.addItem(btn0);
 
 	p2panel1.addItem(new Label('label 2', 20));
+
 	let btn1 = new Button('button 2', 20);
 	btn1.on_press = btn1Press;
 	p2panel1.addItem(btn1);
-
-	p2panel0.setBackground(color(50, 30, 120));
-
-	p2panel1.setBackground(color(50, 30, 120));
 
 	p2layout.addItem(p2panel0);
 
@@ -68,10 +60,6 @@ function setup() {
 
 	grid.setMargin(15);
 	grid.setPadding(10);
-
-	mainPanel.setBackground(color(30, 30, 40));
-
-	mainPanel.resizeEvent(600, 600);
 }
 
 function draw() {
