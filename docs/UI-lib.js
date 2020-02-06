@@ -506,9 +506,11 @@ class Panel extends Component {
 		this.layout;
 		this.bgColor = color(225);
 		this.titleBar = {
-			exists: false,
-			minimumHeight: 30,
+			show: false,
+			minimumHeight: 25,
 			height: 50,
+			textColor: color(0),
+			textSize: 30
 		};
 
 		this.g = createGraphics(this.width, this.height);
@@ -530,12 +532,11 @@ class Panel extends Component {
 		this.g.rect(0, this.layout.y, this.width, this.height-this.layout.y);
 
 
-		// Title Bar and Contents
-		if(this.titleBar.exists) {
+		// Title Bafr
+		if(this.titleBar.show) {
 			//Bar background
 			this.g.fill(170);
 			this.g.rect(0, 0, this.width, this.titleBar.height, 20, 20, 0, 0);
-
 			//Bar outline
 			this.g.noFill();
 			this.g.stroke(100);
@@ -544,7 +545,7 @@ class Panel extends Component {
 			this.g.stroke(50);
 			this.g.line(0, this.titleBar.height, this.width, this.titleBar.height);
 			//Text
-			this.g.fill(0);
+			this.g.fill(this.titleBar.textColor);
 			this.g.textSize(this.width / 30);
 			this.g.textAlign(CENTER, TOP);
 			this.g.text(this.titleBar.title, this.width / 2, this.titleBar.height / 5);
@@ -576,7 +577,7 @@ class Panel extends Component {
 
 		this.g = createGraphics(w, h);
 
-		if(this.titleBar.exists == false || this.titleBar.height == undefined) {
+		if(this.titleBar.show == false || this.titleBar.height == undefined) {
 			this.layout.resizeEvent(w, h);
 		} else {
 			this.layout.resizeEvent(w, h - this.titleBar.height);
@@ -589,15 +590,15 @@ class Panel extends Component {
 	}
 
 	setTitle(title) {
-		this.titleBar.exists = true;
+		this.titleBar.show = true;
 		if(title == '') this.titleBar.exists = false;
 
 		this.titleBar.title = title;
 
-		if(this.height < this.titleBar.minimumHeight * 9) {
+		if(this.height/17 < this.titleBar.minimumHeight) {
 			this.titleBar.height = this.titleBar.minimumHeight;
 		} else {
-			this.titleBar.height = 20;
+			this.titleBar.height = this.height/17;
 		}
 
 		this.layout.setPos(this.layout.x, this.titleBar.height);
