@@ -44,6 +44,8 @@ function setup() {
 	btn0.on_press = btn0Press;
 	p2panel0.addItem(btn0);
 
+	p2panel1.setTitle('Nested Panel 2');
+	
 	p2panel1.addItem(new Label('label 2', 20));
 
 	let btn1 = new Button('button 2', 20);
@@ -60,6 +62,8 @@ function setup() {
 
 	grid.setMargin(15);
 	grid.setPadding(10);
+
+	grid.border.show = false;
 }
 
 function draw() {
