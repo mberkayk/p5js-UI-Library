@@ -29,9 +29,10 @@ class Component {
 		this.setSize(w, h);
 	}
 
-	mouseMoved(x, y, dx, dy) {}
-	mouseDragged(x, y, dx, dy) {}
-	mousePressed(x, y) {print('component');}
+	mouseMoved(x, y, px, py) {}
+	mouseExited(x, y, px, py){}
+	mouseDragged(x, y, px, py) {}
+	mousePressed(x, y) {}
 	mouseReleased(x, y) {}
 	keyPressed() {}
 	keyReleased() {}
@@ -122,7 +123,7 @@ class Button extends Component {
 		this.textSize = tSize;
 
 		colorMode(HSB);
-		this.color = color(200, 80, 80);
+		this.color = color(200, 180, 80);
 		colorMode(RGB);
 
 		this.pressing = false;
@@ -135,9 +136,9 @@ class Button extends Component {
 
 	render(g) {
 
-		g.colorMode(HSB);
+		colorMode(HSB);
 		let c;
-		if(this.pressing) {
+		if(this.pressing) { // if pressing and hovering are both true this runs
 			let b = brightness(this.color) * 0.9 - 3;
 			let s = saturation(this.color) * 1;
 			c = color(hue(this.color), s, b);
@@ -153,27 +154,31 @@ class Button extends Component {
 		g.strokeWeight(1);
 		g.fill(c);
 		g.rect(this.x, this.y, this.width, this.height);
-		g.colorMode(RGB);
+		colorMode(RGB);
 
 		g.noStroke();
 		g.textSize(this.textSize);
-		g.fill(0);
+		g.fill(255);
 		g.textAlign(CENTER, CENTER);
 		g.text(this.text, this.x + this.width / 2, this.y + this.height / 2);
 	}
 
 	mousePressed(x, y) {
-		print('mouse pressed button');
 		this.pressing = true;
 		this.on_press();
 	}
 
-	mouseReleased() {
+	mouseReleased(x, y) {
 		this.pressing = false;
 	}
 
 	mouseMoved(dx, dy) {
 		this.hovering = true;
+	}
+
+	mouseExited(x, y, px, py){
+		this.hovering = false;
+		this.pressing = false;
 	}
 
 	setPos(x, y) {
@@ -206,24 +211,31 @@ class Container extends Component {
 		this.g = createGraphics(w, h);
 	}
 
-	mouseMoved(x, y, dx, dy) {
-		let cx = x - this.x;
-		let cy = x - this.y;
+	mouseMoved(x, y, px, py) {
 		for(let c of this.comps){
-			if(c.x <= cx && c.x + c.width > cx
-				&& c.y <= cy && c.y + c.height > cy){
-					c.mouseMoved(x - c.x, y - c.y, dx, dy);
+			if(c.x <= x && c.x + c.width > x
+				&& c.y <= y && c.y + c.height > y){//first condition
+
+					c.mouseMoved(x - c.x, y - c.y, px - c.x, py - c.y);
+
+			}else if(c.x <= px && c.x + c.width > px
+				&& c.y <= py && c.y + c.height > py){// If first condition is false
+
+					c.mouseExited(x - c.x, y - c.y, px - c.x, py - c.y);
+
 			}
 		}
 	}
 
-	mouseDragged(x, y, dx, dy) {
-		let cx = x - this.x;
-		let cy = x - this.y;
+	mouseExited(x, y, px, py){
+		print('mouse left a layout');
+	}
+
+	mouseDragged(x, y, px, py) {
 		for(let c of this.comps){
-			if(c.x <= cx && c.x + c.width > cx
-				&& c.y <= cy && c.y + c.height > cy){
-					c.mouseDragged(x - c.x, y - c.y, dx, dy);
+			if(c.x <= x && c.x + c.width > x
+				&& c.y <= y && c.y + c.height > y){
+					c.mouseDragged(x - c.x, y - c.y, px, py);
 			}
 		}
 	}
@@ -232,18 +244,15 @@ class Container extends Component {
 		for(let c of this.comps){
 			if(c.x <= x && c.x + c.width > x
 				&& c.y <= y && c.y + c.height > y){
-					print('mouse pressed container ' + (x-c.x) + ' ' + (y-c.y));
 					c.mousePressed(x - c.x, y - c.y);
 			}
 		}
 	}
 
 	mouseReleased(x, y) {
-		let cx = x - this.x;
-		let cy = x - this.y;
 		for(let c of this.comps){
-			if(c.x <= cx && c.x + c.width > cx
-				&& c.y <= cy && c.y + c.height > cy){
+			if(c.x <= x && c.x + c.width > x
+				&& c.y <= y && c.y + c.height > y){
 					c.mouseReleased(x - c.x, y - c.y);
 			}
 		}
@@ -532,6 +541,7 @@ class GridLayout extends Layout {
 		super.render(g);
 
 	}
+
 }
 
 class Panel extends Component {
@@ -647,21 +657,26 @@ class Panel extends Component {
 		this.bgColor = color;
 	}
 
-	mouseMoved(x, y, dx, dy) {
+	mouseMoved(x, y, px, py) {
 		if(this.layout != undefined && y > this.layout.y) {
-			this.layout.mouseMoved(x - this.layout.x, y - this.layout.y, dx, dy);
+			this.layout.mouseMoved(x - this.layout.x, y - this.layout.y,
+				 px - this.layout.x, py - this.layout.y);
 		}
 	}
 
-	mouseDragged(x, y, dx, dy) {
+	mouseExited(x, y, px, py){
+		this.layout.mouseExited(x - this.layout.x, y - this.layout.y,
+			px - this.layout.x, py - this.layout.y);
+	}
+
+	mouseDragged(x, y, px, py) {
 		if(this.layout != undefined && y > this.layout.y) {
-			this.layout.mouseDragged(x - this.layout.x, y - this.layout.y , dx, dy);
+			this.layout.mouseDragged(x - this.layout.x, y - this.layout.y , px, py);
 		}
 	}
+
 	mousePressed(x, y) {
 		if(this.layout != undefined && y > this.layout.y) {
-			print('mouse pressed panel ' + (x - this.layout.x) +
-			 	' ' + (y - this.layout.y));
 			this.layout.mousePressed(x - this.layout.x, y - this.layout.y);
 		}
 	}
@@ -687,22 +702,23 @@ class MainPanel extends Panel {
 	}
 
 	loop() {
+		let prx = pmouseX - this.x;
+		let pry = pmouseY - this.y;
 
-		if((mouseX != pmouseX || mouseY != pmouseY) && !mouseIsPressed) {
-			this.mouseMoved(mouseX - this.x, mouseY - this.y,
-				mouseX - pmouseX, mouseY - pmouseY);
+		let rx = mouseX - this.x; // rx --> relative x
+		let ry = mouseY - this.y;
+
+		if((mouseX != pmouseX || mouseY != pmouseY)) {
+			this.mouseMoved(rx, ry, prx, pry);
 		}
 		if(mouseIsPressed && (mouseX != pmouseX || mouseY != pmouseY)) {
-			this.mouseDragged(mouseX - this.x, mouseY - this.y,
-				mouseX - pmouseX, mouseY - pmouseY);
+			this.mouseDragged(rx, ry, prx, pry);
 		}
 		if(mouseIsPressed && !this.preMousePressed) {
-			print('mouse pressed main panel ' + (mouseX - this.x)
-			+ ' ' + (mouseY - this.y));
-			this.mousePressed(mouseX - this.x, mouseY - this.y);
+			this.mousePressed(rx, ry);
 		}
 		if(!mouseIsPressed && this.preMousePressed) {
-			this.mouseReleased(mouseX - this.x, mouseY - this.y);
+			this.mouseReleased(rx, ry);
 		}
 
 		this.preMousePressed = mouseIsPressed;
