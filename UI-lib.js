@@ -234,9 +234,7 @@ class Container extends Component {
 		}
 	}
 
-	mouseExited(x, y, px, py){
-		print('mouse left a layout');
-	}
+	mouseExited(x, y, px, py){}
 
 	mouseDragged(x, y, px, py) {
 		for(let c of this.comps){
