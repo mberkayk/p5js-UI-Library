@@ -150,8 +150,9 @@ class Button extends Component {
 			c = this.color;
 		}
 
-		g.stroke(0);
-		g.strokeWeight(1);
+		// g.stroke(0);
+		// g.strokeWeight(1);
+		g.noStroke();
 		g.fill(c);
 		g.rect(this.x, this.y, this.width, this.height);
 		colorMode(RGB);
@@ -165,24 +166,30 @@ class Button extends Component {
 
 	mousePressed(x, y) {
 		this.pressing = true;
+		this.requestRender();
 		this.on_press();
 	}
 
 	mouseReleased(x, y) {
 		this.pressing = false;
+		this.requestRender();
 	}
 
 	mouseMoved(dx, dy) {
+		if(this.hovering == false){
+			this.requestRender();
+		}
 		this.hovering = true;
 	}
 
 	mouseExited(x, y, px, py){
 		this.hovering = false;
 		this.pressing = false;
+		this.requestRender();
 	}
 
-	setPos(x, y) {
-		super.setPos(x, y);
+	requestRender(){
+
 	}
 
 }
@@ -595,9 +602,9 @@ class Panel extends Component {
 
 			//Text
 			this.g.fill(this.titleBar.textColor);
-			this.g.textSize(this.width / 30);
-			this.g.textAlign(LEFT, TOP);
-			this.g.text(this.titleBar.title, 10, this.titleBar.height / 5);
+			this.g.textSize(this.titleBar.textSize);
+			this.g.textAlign(LEFT, BOTTOM);
+			this.g.text(this.titleBar.title, 10, this.titleBar.height);
 		}
 
 		//Contents
@@ -640,7 +647,6 @@ class Panel extends Component {
 
 	setTitle(title) {
 		this.titleBar.show = true;
-		if(title == '') this.titleBar.exists = false;
 
 		this.titleBar.title = title;
 
@@ -649,6 +655,8 @@ class Panel extends Component {
 		} else {
 			this.titleBar.height = this.height/17;
 		}
+
+		this.titleBar.textSize = this.titleBar.height - 5;
 
 		this.layout.setPos(this.layout.x, this.titleBar.height);
 	}
@@ -699,9 +707,12 @@ class MainPanel extends Panel {
 
 		super.bgColor = color(10, 10, 10);
 		this.preMousePressed = false;
+		this.shouldRender = true;
 	}
 
-	loop() {
+	loop(g) {
+
+		// Mouse Input Events
 		let prx = pmouseX - this.x;
 		let pry = pmouseY - this.y;
 
@@ -723,6 +734,12 @@ class MainPanel extends Panel {
 
 		this.preMousePressed = mouseIsPressed;
 
+		//Rendering
+		this.shouldRender = true;
+		if(this.shouldRender){
+			this.render(g);
+		}
+
 	}
 
 	keyPressed() {
@@ -735,6 +752,11 @@ class MainPanel extends Panel {
 		for(let c of this.layout.comps) {
 			if(c.inFocus) c.keyReleased();
 		}
+	}
+
+	render(g){
+		super.render(g);
+		this.shouldRender = false;
 	}
 
 }

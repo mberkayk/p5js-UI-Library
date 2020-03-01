@@ -45,7 +45,7 @@ function setup() {
 	p2panel0.addItem(btn0);
 
 	p2panel1.setTitle('Nested Panel 2');
-	
+
 	p2panel1.addItem(new Label('label 2', 20));
 
 	let btn1 = new Button('button 2', 20);
@@ -67,8 +67,7 @@ function setup() {
 }
 
 function draw() {
-	mainPanel.loop();
-	mainPanel.render(gr);
+	mainPanel.loop(gr);
 	image(gr, 0, 0);
 }
 
