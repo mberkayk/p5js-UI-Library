@@ -9,15 +9,14 @@ let p2;
 
 function setup() {
 	createCanvas(600, 600);
-	smooth();
 
-	gr = createGraphics(600, 600);
+	gr = createGraphics(width, height);
 
 	mainPanel = new MainPanel(width, height);
 	grid = new GridLayout(mainPanel, 3, 2);
 	mainPanel.setTitle('Main Panel (With Grid Layout)');
 
-	p0 = new Panel(300, 300);
+	p0 = new Panel(100, 20);
 	p1 = new Panel(200, 200);
 	p2 = new Panel(30, 30);
 
