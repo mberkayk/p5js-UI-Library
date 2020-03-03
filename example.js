@@ -11,7 +11,6 @@ function setup() {
 	createCanvas(600, 600);
 
 	gr = createGraphics(width, height);
-
 	mainPanel = new MainPanel(width, height);
 	grid = new GridLayout(mainPanel, 3, 2);
 	mainPanel.setTitle('Main Panel (With Grid Layout)');
