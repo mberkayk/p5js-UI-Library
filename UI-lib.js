@@ -757,7 +757,8 @@ class MainPanel extends Panel {
 		this.shouldRender = false;
 	}
 
-	renderRequest(x, y, w, h){
+	requestRender(x, y, w, h){
+		this.g.updatePixels();
 	}
 
 }

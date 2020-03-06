@@ -9,6 +9,7 @@ let p2;
 
 function setup() {
 	createCanvas(600, 600);
+	frameRate(500);
 
 	gr = createGraphics(width, height);
 	mainPanel = new MainPanel(width, height);
