@@ -1,3 +1,117 @@
+class Shape {
+	constructor(x, y){
+		this.x = x;
+		this.y = y;
+		this.scale = 1;
+		this.offset = [0, 0];
+		this.fillColor;
+		this.strokeWeight;
+		this.strokeColor;
+		this.type;
+
+		this.flaggedForRender = true;
+	}
+
+	setOffset(x, y){
+		this.offset = [x, y];
+	}
+
+	setScale(s){
+		this.scale = s;
+	}
+}
+
+class Rect extends Shape{
+	constructor(x, y, h, h){
+		super(x, y);
+		this.width;
+		this.height;
+		this.type = 'rect';
+	}
+}
+
+class Ellipse extends Shape {
+	constructor(x, y, w, h){
+		super(x, y);
+		this.width = w;
+		this.height = h;
+		this.type = 'ellipse';
+	}
+}
+
+class Line extends Shape {
+	constructor(x, y, x1, y1){
+		super(x, y);
+		this.x1 = x1;
+		this.y = y1;
+	}
+}
+
+class Text extends Shape {
+	constructor(text, x, y, size){
+		super(x, y);
+		this.size = size;
+		this.text = text;
+		this.type = 'text';
+	}
+
+	setColor(c){
+		this.color = c;
+	}
+
+	setAlignment(h, v){
+		this.alignH = h;
+		this.alignV = v;
+	}
+}
+
+class SVGGraphics {
+	constructor(){
+		this.gElements = []; // Graphical Elements
+	}
+
+	add(element){
+		this.gElements.push(element);
+	}
+
+	renderElement(g, e){
+		g.push();
+		g.fill(e.fillColor);
+		g.strokeWeight(e.strokeWeight);
+		g.stroke(e.strokeColor);
+		g.scale(e.scale);
+		g.translate(e.offset[0], e.offset[1]);
+
+		if(e.type == 'rect'){
+			g.rect(e.x, e.y, e.width, e.height);
+		}else if(e.type == 'ellipse'){
+			g.ellipse(e.x, e.y, e.width, e.height);
+		}else if(e.type == 'line'){
+			g.line(e.x, e.y, e.x1, e.y1);
+		}else if(e.type == 'text'){
+			g.textSize(e.size);
+			g.text(e.text, e.x, e.y);
+		}
+
+		g.pop();
+	}
+
+	renderAll(g){
+		for(let e of gElements){
+			this.renderElement(g, e);
+		}
+	}
+
+	render(g){
+		for(let e of gElements){
+			if(e.flaggedForRender == true){
+				this.renderElement(g, e);
+				t.flaggedForRender
+			}
+		}
+	}
+}
+
 class Component {
 
 	constructor(x, y, w, h) {
