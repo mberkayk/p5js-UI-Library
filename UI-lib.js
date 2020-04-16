@@ -124,15 +124,6 @@ class SVGraphics {
 		}
 	}
 
-	resize(oldWidth, oldHeight, newWidth, newHeight){
-		for(let e of this.gElements){
-			// e.x = (e.x * newWidth) / oldWidth;
-			// e.y = (e.y * newHeight) / oldHeight;
-			// e.width = (e.width * newWidth) / oldWidth;
-			// e.height = (e.height * newHeight) / oldHeight;
-		}
-	}
-
 	setPos(oldX, oldY, newX, newY){
 		for(let e of this.gElements){
 			e.offset[0] += newX - oldX;
@@ -150,7 +141,7 @@ class Component {
 		if(w == undefined) w = 10;
 		if(h == undefined) h = 10;
 
-		this.svgG = new SVGraphics();
+		this.svg = new SVGraphics();
 
 		this.setPos(x, y);
 		this.setSize(w, h);
@@ -160,7 +151,7 @@ class Component {
 	}
 
 	setPos(x, y) {
-		this.svgG.setPos(this.x, this.y, x, y);
+		this.svg.setPos(this.x, this.y, x, y);
 		this.x = x;
 		this.y = y;
 	}
@@ -203,8 +194,8 @@ class Label extends Component {
 		this.bgShape.strokeColor = color(230);
 		this.bgShape.strokeWeight = 1;
 
-		this.svgG.add(this.bgShape);
-		this.svgG.add(this.textShape);
+		this.svg.add(this.bgShape);
+		this.svg.add(this.textShape);
 
 	}
 
@@ -257,8 +248,8 @@ class Button extends Component {
 		this.bgShape.fillColor = this.baseColor;
 		this.bgShape.strokeWeight = 0;
 
-		this.svgG.add(this.bgShape);
-		this.svgG.add(this.textShape);
+		this.svg.add(this.bgShape);
+		this.svg.add(this.textShape);
 
 		this.pressing = false;
 		this.hovering = false;
@@ -328,9 +319,9 @@ class Container extends Component {
 	addItem(item) {
 		this.itemCount++;
 		this.comps.push(item);
-		for(let s of item.svgG.gElements){
+		for(let s of item.svg.gElements){
 			s.translate(item.x, item.y);
-			this.svgG.add(s);
+			this.svg.add(s);
 		}
 	}
 
@@ -398,11 +389,11 @@ class Layout extends Container {
 		this.itemCount++;
 		this.comps.push(item);
 
-		for(let s of item.svgG.gElements) {
+		for(let s of item.svg.gElements) {
 			s.translate(this.x, this.y);
 			s.translate(this.parent.x, this.parent.y);
-			this.parent.svgG.add(s);
-			this.svgG.add(s);
+			this.parent.svg.add(s);
+			this.svg.add(s);
 		}
 	}
 
@@ -698,8 +689,8 @@ class Panel extends Component {
 		this.bgShape.fillColor = color(200, 200, 200, 10);
 		this.bgShape.strokeWeight = 0;
 
-		this.svgG.add(this.bgShape);
-		this.svgG.add(this.titleBar.shape);
+		this.svg.add(this.bgShape);
+		this.svg.add(this.titleBar.shape);
 
 		new VListLayout(this);
 	}
@@ -810,8 +801,8 @@ class MainPanel extends Panel {
 
 	addItem(item){
 		super.addItem(item);
-		for(let s of item.svgG.gElements){
-			this.svgG.add(s);
+		for(let s of item.svg.gElements){
+			this.svg.add(s);
 		}
 	}
 
@@ -859,7 +850,7 @@ class MainPanel extends Panel {
 	}
 
 	render(g){
-		this.svgG.renderAll(g);
+		this.svg.renderAll(g);
 		this.shouldRender = false;
 	}
 }
