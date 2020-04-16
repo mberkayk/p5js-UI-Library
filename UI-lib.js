@@ -189,12 +189,14 @@ class Label extends Component {
 	constructor(text, tSize) {
 		super();
 
-		this.textShape = new Text(text, this.x, this.y , tSize);
-		this.textShape.fillColor = color(255);
-
 		let size = this.calculateSize(text, tSize);
 		this.width = size[0];
 		this.height =  size[1];
+
+		this.textShape = new Text(text, this.x + size[0]/2, this.y + size[1]/2, tSize);
+		this.textShape.alignH = CENTER;
+		this.textShape.alignV = CENTER;
+		this.textShape.fillColor = color(255);
 
 		this.bgShape = new Rect(this.x, this.y, this.width, this.height);
 		this.bgShape.fillColor = color(0, 0, 0, 50);
@@ -219,7 +221,7 @@ class Label extends Component {
 			}
 
 		}
-		let height = (this.textShape.height + 3) * lines.length;
+		let height = (tSize + 3) * lines.length;
 
 		return [width * 1.1, height];
 	}
