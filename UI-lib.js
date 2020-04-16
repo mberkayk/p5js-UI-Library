@@ -199,7 +199,7 @@ class Label extends Component {
 		this.textShape.fillColor = color(255);
 
 		this.bgShape = new Rect(this.x, this.y, this.width, this.height);
-		this.bgShape.fillColor = color(0, 0, 0, 50);
+		this.bgShape.fillColor = color(0, 0, 0, 0);
 		this.bgShape.strokeColor = color(230);
 		this.bgShape.strokeWeight = 1;
 
@@ -251,9 +251,11 @@ class Button extends Component {
 
 		this.textShape = new Text(text, this.x, this.y , tSize);
 
+		this.baseColor = color(90, 120, 220);
+
 		this.bgShape = new Rect(this.x, this.y, this.width, this.height);
-		this.bgShape.fillColor = color(200, 180, 80);
-		this.bgShape.stroke = color(230);
+		this.bgShape.fillColor = this.baseColor;
+		this.bgShape.strokeWeight = 0;
 
 		this.svgG.add(this.bgShape);
 		this.svgG.add(this.textShape);
@@ -268,19 +270,19 @@ class Button extends Component {
 
 	reColor() {
 		colorMode(HSB);
-		let c;
+		let c = this.baseColor;
 		if(this.pressing) { // if pressing and hovering are both true this runs
-			let b = brightness(this.color) * 0.9 - 3;
-			let s = saturation(this.color) * 1;
-			c = color(hue(this.color), s, b);
+			let b = brightness(c) * 0.9 - 3;
+			let s = saturation(c) * 1;
+			c = color(hue(c), s, b);
 		} else if(this.hovering) {
-			let b = brightness(this.color) * 1.1 + 5;
-			let s = saturation(this.color) * 1;
-			c = color(hue(this.color), s, b);
-		} else {
-			c = this.bgShape.fillColor;
+			// let b = brightness(c) * 1.3 + 5;
+			// let s = saturation(c) * 1;
+			// c = color(hue(c), s, b);
+			// c = color(100, 0, 0);
 		}
 		colorMode(RGB);
+		this.bgShape.fillColor = c;
 	}
 
 	mousePressed(x, y) {

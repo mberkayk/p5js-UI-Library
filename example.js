@@ -35,7 +35,7 @@ function setup() {
 	let p2panel0 = new Panel(250, 200);
 	let p2panel1 = new Panel(250, 200);
 
-	p2panel0.setTitle('Nested Panel 1');
+	p2panel0.setTitle('Inner Panel 1');
 
 	p2panel0.addItem(new Label('label 1', 15));
 
@@ -43,7 +43,7 @@ function setup() {
 	btn0.on_press = btn0Press;
 	p2panel0.addItem(btn0);
 
-	p2panel1.setTitle('Nested Panel 2');
+	p2panel1.setTitle('Inner Panel 2');
 
 	p2panel1.addItem(new Label('label 2', 20));
 
