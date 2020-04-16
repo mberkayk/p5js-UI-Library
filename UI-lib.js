@@ -77,7 +77,7 @@ class Text extends Shape {
 	}
 }
 
-class SVGGraphics {
+class SVGraphics {
 	constructor(){
 		this.gElements = []; // Graphical Elements
 	}
@@ -150,7 +150,7 @@ class Component {
 		if(w == undefined) w = 10;
 		if(h == undefined) h = 10;
 
-		this.svgG = new SVGGraphics();
+		this.svgG = new SVGraphics();
 
 		this.setPos(x, y);
 		this.setSize(w, h);
