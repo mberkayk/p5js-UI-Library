@@ -1,3 +1,137 @@
+class Shape {
+	constructor(x, y){
+		this.x = x;
+		this.y = y;
+		this.scale = 1;
+		this.offset = [0, 0];
+		this.fillColor = color(0, 0, 0, 0);
+		this.strokeWeight = 1;
+		this.strokeColor = color(0);
+		this.type;
+
+		this.flaggedForRender = true;
+	}
+
+	translate(x, y){
+		this.offset[0] += x;
+		this.offset[1] += y;
+	}
+
+	setOffset(x, y){
+		this.offset = [x, y];
+	}
+
+	setScale(s){
+		this.scale = s;
+	}
+}
+
+class Rect extends Shape{
+	constructor(x, y, w, h){
+		super(x, y);
+		this.width = w;
+		this.height = h;
+		this.type = 'rect';
+	}
+}
+
+class Ellipse extends Shape {
+	constructor(x, y, w, h){
+		super(x, y);
+		this.width = w;
+		this.height = h;
+		this.type = 'ellipse';
+	}
+}
+
+class Line extends Shape {
+	constructor(x, y, x1, y1){
+		super(x, y);
+		this.x1 = x1;
+		this.y = y1;
+	}
+}
+
+class Text extends Shape {
+	constructor(text, x, y, size){
+		super(x, y);
+		this.height = size;
+		this.text = text;
+		this.type = 'text';
+		this.alignH = LEFT;
+		this.alignV = TOP;
+
+		this.fillColor = color(255);
+		this.strokeWeight = 0;
+		textSize(this.height)
+		// this.width = textWidth(text);
+	}
+
+	setColor(c){
+		this.color = c;
+	}
+
+	setAlignment(h, v){
+		this.alignH = h;
+		this.alignV = v;
+	}
+}
+
+class SVGraphics {
+	constructor(){
+		this.gElements = []; // Graphical Elements
+	}
+
+	add(element){
+		this.gElements.push(element);
+	}
+
+	renderElement(g, e){
+		g.push();
+		g.fill(e.fillColor);
+		g.strokeWeight(e.strokeWeight);
+		g.stroke(e.strokeColor);
+		g.scale(e.scale);
+		g.translate(e.offset[0], e.offset[1]);
+
+		if(e.type == 'rect'){
+			g.rect(e.x, e.y, e.width, e.height);
+		}else if(e.type == 'ellipse'){
+			g.ellipse(e.x, e.y, e.width, e.height);
+		}else if(e.type == 'line'){
+			g.line(e.x, e.y, e.x1, e.y1);
+		}else if(e.type == 'text'){
+			g.textSize(e.height);
+			g.textAlign(e.alignH, e.alignV);
+			g.text(e.text, e.x, e.y);
+		}
+
+		g.pop();
+	}
+
+	renderAll(g){
+		for(let e of this.gElements){
+			this.renderElement(g, e);
+		}
+	}
+
+	renderAllFlagged(g){
+		for(let e of this.gElements){
+			if(e.flaggedForRender == true){
+				this.renderElement(g, e);
+				e.flaggedForRender = false;
+			}
+		}
+	}
+
+	setPos(oldX, oldY, newX, newY){
+		for(let e of this.gElements){
+			e.offset[0] += newX - oldX;
+			e.offset[1] += newY - oldY;
+		}
+	}
+}
+
 class Component {
 
 	constructor(x, y, w, h) {
@@ -7,13 +141,17 @@ class Component {
 		if(w == undefined) w = 10;
 		if(h == undefined) h = 10;
 
+		this.svg = new SVGraphics();
+
 		this.setPos(x, y);
 		this.setSize(w, h);
 
 		this.inFocus = true;
+
 	}
 
 	setPos(x, y) {
+		this.svg.setPos(this.x, this.y, x, y);
 		this.x = x;
 		this.y = y;
 	}
@@ -22,8 +160,6 @@ class Component {
 		this.width = w;
 		this.height = h;
 	}
-
-	render(g) {}
 
 	resizeEvent(w, h) {
 		this.setSize(w, h);
@@ -44,16 +180,23 @@ class Label extends Component {
 	constructor(text, tSize) {
 		super();
 
-		textSize(tSize);
 		let size = this.calculateSize(text, tSize);
-		this.setSize(size[0], size[1]);
+		this.width = size[0];
+		this.height =  size[1];
 
-		this.bgColor = color(0, 0, 0, 0);
-		this.textSize = tSize;
-		this.textColor = color(230);
-		this.borderColor = 230;
-		this.borderThickness = 1;
-		this.text = text;
+		this.textShape = new Text(text, this.x + size[0]/2, this.y + size[1]/2, tSize);
+		this.textShape.alignH = CENTER;
+		this.textShape.alignV = CENTER;
+		this.textShape.fillColor = color(255);
+
+		this.bgShape = new Rect(this.x, this.y, this.width, this.height);
+		this.bgShape.fillColor = color(0, 0, 0, 0);
+		this.bgShape.strokeColor = color(230);
+		this.bgShape.strokeWeight = 1;
+
+		this.svg.add(this.bgShape);
+		this.svg.add(this.textShape);
+
 	}
 
 	calculateSize(text, tSize){
@@ -69,45 +212,23 @@ class Label extends Component {
 			}
 
 		}
-		let height = (textAscent() + textDescent()) * lines.length;
+		let height = (tSize + 3) * lines.length;
 
 		return [width * 1.1, height];
 	}
 
 	setText(t) {
-		this.text = t;
-		this.calculateSize(this.text, this.textSize);
-	}
-
-	render(g) {
-		//Background
-		if(this.bgColor != undefined) {
-			g.fill(this.bgColor);
-			g.rect(this.x, this.y, this.width, this.height)
-		}
-
-		//Text
-		g.noStroke();
-		g.fill(this.textColor);
-		g.textSize(this.textSize);
-		g.textAlign(CENTER, CENTER);
-		g.text(this.text, this.x + this.width / 2, this.y + this.height / 2);
-
-		//Borders
-		g.stroke(this.borderColor);
-		g.strokeWeight(this.borderThickness);
-		g.noFill();
-		g.rect(this.x, this.y, this.width, this.height);
-
-	}
-
-	setBackground(color) {
-		this.bgColor = color;
+		this.textShape.textSize = t;
+		this.calculateSize(this.textShape.text, this.textShape.textSize);
 	}
 
 	resizeEvent(w, h) {
-		super.resizeEvent(w, h);
-		this.textSize = h;
+		this.width = w;
+		this.height = h;
+
+		this.bgShape.width = w;
+		this.bgShape.height = h;
+		this.textShape.height = h;
 	}
 
 }
@@ -119,12 +240,16 @@ class Button extends Component {
 		let str = String(text);
 		super(0, 0, textWidth(str) * 1.1, textAscent() + textDescent());
 
-		this.text = text;
-		this.textSize = tSize;
+		this.textShape = new Text(text, this.x, this.y , tSize);
 
-		colorMode(HSB);
-		this.color = color(200, 180, 80);
-		colorMode(RGB);
+		this.baseColor = color(90, 120, 220);
+
+		this.bgShape = new Rect(this.x, this.y, this.width, this.height);
+		this.bgShape.fillColor = this.baseColor;
+		this.bgShape.strokeWeight = 0;
+
+		this.svg.add(this.bgShape);
+		this.svg.add(this.textShape);
 
 		this.pressing = false;
 		this.hovering = false;
@@ -134,34 +259,21 @@ class Button extends Component {
 		this.on_release = function() {};
 	}
 
-	render(g) {
-
+	reColor() {
 		colorMode(HSB);
-		let c;
+		let c = this.baseColor;
 		if(this.pressing) { // if pressing and hovering are both true this runs
-			let b = brightness(this.color) * 0.9 - 3;
-			let s = saturation(this.color) * 1;
-			c = color(hue(this.color), s, b);
+			let b = brightness(c) * 0.9 - 3;
+			let s = saturation(c) * 1;
+			c = color(hue(c), s, b);
 		} else if(this.hovering) {
-			let b = brightness(this.color) * 1.1 + 5;
-			let s = saturation(this.color) * 1;
-			c = color(hue(this.color), s, b);
-		} else {
-			c = this.color;
+			// let b = brightness(c) * 1.3 + 5;
+			// let s = saturation(c) * 1;
+			// c = color(hue(c), s, b);
+			// c = color(100, 0, 0);
 		}
-
-		// g.stroke(0);
-		// g.strokeWeight(1);
-		g.noStroke();
-		g.fill(c);
-		g.rect(this.x, this.y, this.width, this.height);
 		colorMode(RGB);
-
-		g.noStroke();
-		g.textSize(this.textSize);
-		g.fill(255);
-		g.textAlign(CENTER, CENTER);
-		g.text(this.text, this.x + this.width / 2, this.y + this.height / 2);
+		this.bgShape.fillColor = c;
 	}
 
 	mousePressed(x, y) {
@@ -189,7 +301,9 @@ class Button extends Component {
 	}
 
 	requestRender(){
-
+		this.reColor();
+		this.textShape.flaggedForRender = true;
+		this.bgShape.flaggedForRender = true;
 	}
 
 }
@@ -202,20 +316,17 @@ class Container extends Component {
 		this.itemCount = 0;
 	}
 
-	render(g) {
-		for(const comp of this.comps) {
-			comp.render(g);
-		}
-	}
-
 	addItem(item) {
 		this.itemCount++;
 		this.comps.push(item);
+		for(let s of item.svg.gElements){
+			s.translate(item.x, item.y);
+			this.svg.add(s);
+		}
 	}
 
 	resizeEvent(w, h) {
 		super.resizeEvent(w, h);
-		this.g = createGraphics(w, h);
 	}
 
 	mouseMoved(x, y, px, py) {
@@ -233,9 +344,7 @@ class Container extends Component {
 			}
 		}
 	}
-
 	mouseExited(x, y, px, py){}
-
 	mouseDragged(x, y, px, py) {
 		for(let c of this.comps){
 			if(c.x <= x && c.x + c.width > x
@@ -244,7 +353,6 @@ class Container extends Component {
 			}
 		}
 	}
-
 	mousePressed(x, y) {
 		for(let c of this.comps){
 			if(c.x <= x && c.x + c.width > x
@@ -253,7 +361,6 @@ class Container extends Component {
 			}
 		}
 	}
-
 	mouseReleased(x, y) {
 		for(let c of this.comps){
 			if(c.x <= x && c.x + c.width > x
@@ -262,6 +369,7 @@ class Container extends Component {
 			}
 		}
 	}
+
 	keyPressed() {}
 	keyReleased() {}
 
@@ -277,8 +385,16 @@ class Layout extends Container {
 
 	}
 
-	render(g) {
-		super.render(g);
+	addItem(item) {
+		this.itemCount++;
+		this.comps.push(item);
+
+		for(let s of item.svg.gElements) {
+			s.translate(this.x, this.y);
+			s.translate(this.parent.x, this.parent.y);
+			this.parent.svg.add(s);
+			this.svg.add(s);
+		}
 	}
 
 	resizeEvent(w, h) {
@@ -330,7 +446,6 @@ class VListLayout extends ListLayout {
 
 	addItem(item) {
 		super.addItem(item);
-		this.calculatePosition();
 	}
 }
 
@@ -351,7 +466,6 @@ class HListLayout extends ListLayout {
 
 	resizeEvent(w, h) {
 		super.resizeEvent(w, h);
-		this.calculatePosition();
 	}
 
 }
@@ -370,11 +484,14 @@ class GridLayout extends Layout {
 			this.cells.push(false); //Empty
 		}
 
-		//  compsGridIndex[a]=index of the grid cell component is in. a = component's index in comps array)
+		//compsGridIndex[a]=index of the grid cell component is in. a = component's index in comps array)
 		this.compsGridAtts = [];
 
 		this.margin = 0;
 		this.padding = 0;
+
+
+		this.calculateGridSize();
 
 		this.border = {
 			show: true,
@@ -382,7 +499,12 @@ class GridLayout extends Layout {
 			thickness: 1.25
 		};
 
-		this.calculateGridSize();
+		// this.borderShapes = [];
+		// for(let i = 0; i < this.columns; i++){
+		// 	for(let j = 0; j < this.rows; j++){
+		// 		this.borderShapes.push(new Rect(j*));
+		// 	}
+		// }
 	}
 
 	addItem(c, x, y, w, h) { // Component, GridX, GridY, horizontal span, vertical span
@@ -498,7 +620,7 @@ class GridLayout extends Layout {
 		this.resizeEvent(this.width, this.height);
 	}
 
-	render(g) {
+	renderBorders() {
 
 		//display borders
 		if(this.border.show == true) {
@@ -514,7 +636,7 @@ class GridLayout extends Layout {
 					// x and y values in this.g graphics object
 					let x = this.margin + (this.margin * gridX * 2) + (gridX * this.gridWidth);
 					let y = this.margin + (this.margin * gridY * 2) + (gridY * this.gridHeight);
-					g.rect(x, y, this.gridWidth, this.gridHeight);
+					this.borderRects.push(new Rect(x, y, this.gridWidth, this.gridHeight));
 				}
 			}
 
@@ -537,13 +659,11 @@ class GridLayout extends Layout {
 				g.stroke(this.border.color);
 				g.strokeWeight(this.border.thickness);
 				g.noFill();
-				g.rect(x, y, w, h);
+				this.borderRects.push(new Rect(x, y, w, h));
 
 			}
 
 		}
-
-		super.render(g);
 
 	}
 
@@ -555,64 +675,24 @@ class Panel extends Component {
 		super(0, 0, w, h);
 
 		this.layout;
-		this.bgColor = color(20, 23, 30);
 		this.titleBar = {
 			show: false,
 			minimumHeight: 25,
 			height: 50,
 			textColor: color(230),
-			textSize: 30
+			shape: new Text('', 10, 5, 30)
 		};
 
-		this.g = createGraphics(this.width, this.height);
+		this.titleBar.shape.fillColor = this.titleBar.textColor;
+
+		this.bgShape = new Rect(0, 0, this.width, this.height);
+		this.bgShape.fillColor = color(200, 200, 200, 10);
+		this.bgShape.strokeWeight = 0;
+
+		this.svg.add(this.bgShape);
+		this.svg.add(this.titleBar.shape);
 
 		new VListLayout(this);
-	}
-
-	render(g) {
-
-		//Background
-		this.g.noStroke();
-		this.g.fill(this.bgColor);
-		this.g.rect(0, this.layout.y, this.width, this.height);
-
-		//Outline
-		// this.g.noFill();
-		// this.g.stroke(50);
-		// this.g.strokeWeight(1);
-		// this.g.rect(0, this.layout.y, this.width, this.height-this.layout.y);
-
-
-		// Title Bar
-		if(this.titleBar.show) {
-			//Bar background
-			this.g.noStroke();
-			this.g.fill(this.bgColor);
-			this.g.rect(0, 0, this.width, this.titleBar.height, 20, 20, 0, 0);
-
-			//Bar outline
-			// this.g.noFill();
-			// this.g.stroke(100);
-			// this.g.strokeWeight(1);
-			// this.g.rect(0, 0, this.width, this.titleBar.height - 1, 20, 20, 0, 0);
-			// this.g.stroke(50);
-			// this.g.line(0, this.titleBar.height, this.width, this.titleBar.height);
-
-			//Text
-			this.g.fill(this.titleBar.textColor);
-			this.g.textSize(this.titleBar.textSize);
-			this.g.textAlign(LEFT, BOTTOM);
-			this.g.text(this.titleBar.title, 10, this.titleBar.height);
-		}
-
-		//Contents
-		this.g.push();
-		this.g.translate(this.layout.x, this.layout.y);
-		this.layout.render(this.g);
-		this.g.pop();
-
-		g.image(this.g, this.x, this.y);
-
 	}
 
 	setLayout(layout) {
@@ -629,14 +709,25 @@ class Panel extends Component {
 	resizeEvent(w, h) {
 		super.resizeEvent(w, h);
 
-		this.g = createGraphics(w, h);
-
-		if(this.titleBar.show == false || this.titleBar.height == undefined) {
+		if(this.titleBar.show == false) {
 			this.layout.resizeEvent(w, h);
 		} else {
 			this.layout.resizeEvent(w, h - this.titleBar.height);
 		}
 
+		this.setTitle(this.titleBar.shape.text);
+		this.titleBar.shape.x = 10;
+		this.titleBar.shape.y = 2;
+
+		this.bgShape.width = w;
+		this.bgShape.height = h;
+	}
+
+	setPos(x, y){
+		if(this.titleBar != undefined){
+			//////TODO
+		}
+		super.setPos(x, y);
 	}
 
 	addItem(item) {
@@ -646,7 +737,7 @@ class Panel extends Component {
 	setTitle(title) {
 		this.titleBar.show = true;
 
-		this.titleBar.title = title;
+		this.titleBar.shape.text = title;
 
 		if(this.height/17 < this.titleBar.minimumHeight) {
 			this.titleBar.height = this.titleBar.minimumHeight;
@@ -654,13 +745,14 @@ class Panel extends Component {
 			this.titleBar.height = this.height/17;
 		}
 
-		this.titleBar.textSize = this.titleBar.height - 5;
+		this.titleBar.shape.height = this.titleBar.height - 5;
+
 
 		this.layout.setPos(this.layout.x, this.titleBar.height);
 	}
 
 	setBackground(color) {
-		this.bgColor = color;
+		this.bgShape.fillColor = color;
 	}
 
 	mouseMoved(x, y, px, py) {
@@ -699,13 +791,19 @@ class Panel extends Component {
 // Should only be one MainPanel in a sketch
 class MainPanel extends Panel {
 
-
 	constructor(w, h) {
 		super(w, h);
 
-		super.bgColor = color(10, 10, 10);
+		this.bgShape.fillColor = color(20, 23, 30);
 		this.preMousePressed = false;
 		this.shouldRender = true;
+	}
+
+	addItem(item){
+		super.addItem(item);
+		for(let s of item.svg.gElements){
+			this.svg.add(s);
+		}
 	}
 
 	loop(g) {
@@ -732,7 +830,6 @@ class MainPanel extends Panel {
 
 		this.preMousePressed = mouseIsPressed;
 
-		//Rendering
 		this.shouldRender = true;
 		if(this.shouldRender){
 			this.render(g);
@@ -753,12 +850,7 @@ class MainPanel extends Panel {
 	}
 
 	render(g){
-		super.render(g);
+		this.svg.renderAll(g);
 		this.shouldRender = false;
 	}
-
-	requestRender(x, y, w, h){
-		this.g.updatePixels();
-	}
-
 }
