@@ -336,6 +336,7 @@ class Button extends Component {
 
 	flagForRender(){
 		this.reColor();
+		this.label.flagForRender();
 	}
 
 }
