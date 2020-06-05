@@ -839,7 +839,6 @@ class MainPanel extends Panel {
 
 		this.bgShape.fillColor = color(20, 23, 30);
 		this.preMousePressed = false;
-		this.shouldRender = true;
 	}
 
 	addItem(item){
@@ -873,10 +872,8 @@ class MainPanel extends Panel {
 
 		this.preMousePressed = mouseIsPressed;
 
-		this.shouldRender = true;
-		if(this.shouldRender){
-			this.render(g);
-		}
+
+		this.render(g);
 
 	}
 
@@ -894,6 +891,5 @@ class MainPanel extends Panel {
 
 	render(g){
 		this.svg.renderAll(g);
-		this.shouldRender = false;
 	}
 }
