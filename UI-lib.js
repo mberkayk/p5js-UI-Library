@@ -767,9 +767,6 @@ class Panel extends Component {
 	}
 
 	setPos(x, y){
-		if(this.titleBar != undefined){
-			//////TODO
-		}
 		super.setPos(x, y);
 	}
 
