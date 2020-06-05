@@ -24,6 +24,11 @@ class Shape {
 	setScale(s){
 		this.scale = s;
 	}
+
+	flagForRender(){
+		this.flaggedForRender = true;
+	}
+
 }
 
 class Rect extends Shape{
