@@ -312,18 +312,18 @@ class Button extends Component {
 
 	mousePressed(x, y) {
 		this.pressing = true;
-		this.requestRender();
+		this.flagForRender();
 		this.on_press();
 	}
 
 	mouseReleased(x, y) {
 		this.pressing = false;
-		this.requestRender();
+		this.flagForRender();
 	}
 
 	mouseMoved(dx, dy) {
 		if(this.hovering == false){
-			this.requestRender();
+			this.flagForRender();
 		}
 		this.hovering = true;
 	}
@@ -331,10 +331,10 @@ class Button extends Component {
 	mouseExited(x, y, px, py){
 		this.hovering = false;
 		this.pressing = false;
-		this.requestRender();
+		this.flagForRender();
 	}
 
-	requestRender(){
+	flagForRender(){
 		this.reColor();
 	}
 
