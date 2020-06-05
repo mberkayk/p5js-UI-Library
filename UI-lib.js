@@ -97,6 +97,12 @@ class SVGraphics {
 			}
 	}
 
+	flagAllForRender(){
+		for(let e of this.gElements){
+			e.flagForRender();
+		}
+	}
+
 	renderElement(g, e){
 		g.push();
 		g.fill(e.fillColor);
@@ -174,6 +180,10 @@ class Component {
 
 	resizeEvent(w, h) {
 		this.setSize(w, h);
+	}
+
+	flagForRender(){
+		this.svg.flagAllForRender();
 	}
 
 	mouseMoved(x, y, px, py) {}
