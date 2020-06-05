@@ -120,13 +120,13 @@ class SVGraphics {
 		g.pop();
 	}
 
-	renderAll(g){
+	renderAllEvenIfNotFlagged(g){
 		for(let e of this.gElements){
 			this.renderElement(g, e);
 		}
 	}
 
-	renderAllFlagged(g){
+	renderAllg){
 		for(let e of this.gElements){
 			if(e.flaggedForRender == true){
 				this.renderElement(g, e);
