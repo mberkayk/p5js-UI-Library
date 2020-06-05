@@ -792,6 +792,8 @@ class Panel extends Component {
 
 
 		this.layout.setPos(this.layout.x, this.titleBar.height);
+
+		this.flagForRender();
 	}
 
 	setBackground(color) {
