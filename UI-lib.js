@@ -86,6 +86,12 @@ class SVGraphics {
 		this.gElements.push(element);
 	}
 
+	addArray(arr){
+			for(let i = 0; i < arr.length; i++){
+				this.gElements.push(arr[i]);
+			}
+	}
+
 	renderElement(g, e){
 		g.push();
 		g.fill(e.fillColor);
@@ -231,6 +237,22 @@ class Label extends Component {
 		this.textShape.height = h;
 	}
 
+	setBgColor(color){
+		this.bgShape.fillColor = color;
+	}
+
+	getShapes(){
+		return [this.bgShape, this.textShape];
+	}
+
+	setOutlineColor(c){
+		this.bgShape.strokeColor = c;
+	}
+
+	setOutlineWeight(w){
+		this.bgShape.strokeWeight = w;
+	}
+
 }
 
 class Button extends Component {
@@ -240,16 +262,22 @@ class Button extends Component {
 		let str = String(text);
 		super(0, 0, textWidth(str) * 1.1, textAscent() + textDescent());
 
-		this.textShape = new Text(text, this.x, this.y , tSize);
+		// this.textShape = new Text(text, this.x, this.y , tSize);
 
 		this.baseColor = color(90, 120, 220);
 
-		this.bgShape = new Rect(this.x, this.y, this.width, this.height);
-		this.bgShape.fillColor = this.baseColor;
-		this.bgShape.strokeWeight = 0;
+		// this.bgShape = new Rect(this.x, this.y, this.width, this.height);
+		// this.bgShape.fillColor = this.baseColor;
+		// this.bgShape.strokeWeight = 0;
 
-		this.svg.add(this.bgShape);
-		this.svg.add(this.textShape);
+		// this.svg.add(this.bgShape);
+		// this.svg.add(this.textShape);
+
+		this.label = new Label(text, tSize);
+		this.label.setBgColor(this.baseColor);
+		this.label.setOutlineWeight(0);
+
+		this.svg.addArray(this.label.getShapes());
 
 		this.pressing = false;
 		this.hovering = false;
@@ -273,7 +301,8 @@ class Button extends Component {
 			// c = color(100, 0, 0);
 		}
 		colorMode(RGB);
-		this.bgShape.fillColor = c;
+
+		this.label.setBgColor(c);
 	}
 
 	mousePressed(x, y) {
@@ -302,8 +331,6 @@ class Button extends Component {
 
 	requestRender(){
 		this.reColor();
-		this.textShape.flaggedForRender = true;
-		this.bgShape.flaggedForRender = true;
 	}
 
 }
