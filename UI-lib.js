@@ -126,7 +126,7 @@ class SVGraphics {
 		}
 	}
 
-	renderAllg){
+	renderAll(){
 		for(let e of this.gElements){
 			if(e.flaggedForRender == true){
 				this.renderElement(g, e);
