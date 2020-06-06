@@ -68,8 +68,8 @@ class Text extends Shape {
 
 		this.fillColor = color(255);
 		this.strokeWeight = 0;
-		textSize(this.height)
-		// this.width = textWidth(text);
+		textSize(this.height);
+		this.width = textWidth(text);
 	}
 
 	setColor(c){
@@ -80,6 +80,12 @@ class Text extends Shape {
 		this.alignH = h;
 		this.alignV = v;
 	}
+
+	setSize(size){
+		this.height = size;
+		this.width = textWidth(text);
+	}
+
 }
 
 class SVGraphics {
@@ -349,6 +355,46 @@ class Button extends Component {
 		this.label.flagForRender();
 	}
 
+}
+
+class TextBox extends Component {
+	constructor(defaultText, w, h){
+		super(0, 0, w, h);
+
+		this.inFocus = false;
+
+		this.boxShape = new Rect(this.x, this.y, this.width, this.height);
+		this.boxShape.fillColor = color(255);
+		this.boxShape.strokeWeight = 1;
+		this.boxShape.strokeColor = color(0);
+
+		this.textShape = new Text(defaultText, this.x, this.y, this.height - 2);
+		this.textShape.fillColor = color(100);
+
+
+		this.cursorShape = new Line(this.textShape.width,2,this.textShape.width,this.height-2);
+		this.cursorShape.strokeColor = color(100, 100, 100, 100);
+		this.cursorShape.strokeWeight = 2;
+
+		this.svg.add(this.boxShape);
+		this.svg.add(this.textShape);
+		this.svg.add(this.cursorShape)
+
+	}
+
+	mousePressed(){
+		if(this.inFocus == false){
+			this.inFocus = true;
+		}else{
+			this.calculateCursorPos();
+		}
+
+		this.flagForRender();
+	}
+
+	keyPressed(key){
+		this.textShape.text += key;
+	}
 }
 
 class Container extends Component {
