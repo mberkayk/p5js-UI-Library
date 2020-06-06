@@ -536,18 +536,6 @@ class GridLayout extends Layout {
 
 		this.calculateGridSize();
 
-		this.border = {
-			show: true,
-			color: color(150),
-			thickness: 1.25
-		};
-
-		// this.borderShapes = [];
-		// for(let i = 0; i < this.columns; i++){
-		// 	for(let j = 0; j < this.rows; j++){
-		// 		this.borderShapes.push(new Rect(j*));
-		// 	}
-		// }
 	}
 
 	addItem(c, x, y, w, h) { // Component, GridX, GridY, horizontal span, vertical span
@@ -661,53 +649,6 @@ class GridLayout extends Layout {
 	setPadding(p) {
 		this.padding = p;
 		this.resizeEvent(this.width, this.height);
-	}
-
-	renderBorders() {
-
-		//display borders
-		if(this.border.show == true) {
-			//FOR EMPTY CELLS
-			for(let i = 0; i < this.numberOfCells; i++) {
-				if(this.cells[i] == false) { // if the cell is empty
-					g.strokeWeight(this.border.thickness);
-					g.stroke(this.border.color);
-					g.noFill();
-					// gridX and gridY values of the cell that has the 'i'th index in "cells[]"
-					let gridX = i % this.columns;
-					let gridY = floor(i / this.columns);
-					// x and y values in this.g graphics object
-					let x = this.margin + (this.margin * gridX * 2) + (gridX * this.gridWidth);
-					let y = this.margin + (this.margin * gridY * 2) + (gridY * this.gridHeight);
-					this.borderRects.push(new Rect(x, y, this.gridWidth, this.gridHeight));
-				}
-			}
-
-			//FOR OCCUPIED cells
-			for(let i = 0; i < this.itemCount; i++) {
-
-				//x and y values in this.g graphics object
-				let x = this.margin + (this.margin * this.compsGridAtts[i].gridX * 2) +
-					(this.compsGridAtts[i].gridX * this.gridWidth);
-				let y = this.margin + (this.margin * this.compsGridAtts[i].gridY * 2) +
-					(this.compsGridAtts[i].gridY * this.gridHeight);
-
-				// width and the height of the border rectangle
-				let hSpan = this.compsGridAtts[i].hSpan;
-				let vSpan = this.compsGridAtts[i].vSpan;
-
-				let w = hSpan * this.gridWidth + this.margin * 2 * (hSpan - 1);
-				let h = vSpan * this.gridHeight + this.margin * 2 * (vSpan - 1);
-
-				g.stroke(this.border.color);
-				g.strokeWeight(this.border.thickness);
-				g.noFill();
-				this.borderRects.push(new Rect(x, y, w, h));
-
-			}
-
-		}
-
 	}
 
 }
