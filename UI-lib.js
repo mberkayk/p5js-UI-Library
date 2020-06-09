@@ -65,7 +65,7 @@ class Text extends Shape {
 	constructor(text, x, y, size){
 		super(x, y);
 		this.height = size;
-		this.text = text;
+		this.text = String(text);
 		this.type = 'text';
 		this.alignH = LEFT;
 		this.alignV = TOP;
@@ -73,7 +73,7 @@ class Text extends Shape {
 		this.fillColor = color(255);
 		this.strokeWeight = 0;
 		textSize(this.height);
-		this.width = textWidth(text);
+		this.width = textWidth(String(text));
 	}
 
 	setColor(c){
@@ -87,7 +87,7 @@ class Text extends Shape {
 
 	setSize(size){
 		this.height = size;
-		this.width = textWidth(text);
+		this.width = textWidth(this.text);
 	}
 
 }
@@ -365,6 +365,7 @@ class Button extends Component {
 }
 
 class TextBox extends Component {
+
 	constructor(defaultText, w, h){
 		super(0, 0, w, h);
 
@@ -379,15 +380,17 @@ class TextBox extends Component {
 		this.textShape.fillColor = color(120);
 
 
+		print("text shape width: " + this.textShape.width);
 		this.cursorShape = new Line(this.textShape.width,2,this.textShape.width,this.height-2);
-		this.cursorShape.strokeColor = color(100, 100, 100, 100);
-		this.cursorShape.strokeWeight = 2;
+		this.cursorShape.strokeColor = color(255, 0, 0);
+		this.cursorShape.strokeWeight = 5;
 
 		this.svg.add(this.boxShape);
 		this.svg.add(this.textShape);
 		this.svg.add(this.cursorShape);
 
-		this.cursorSpeed = 3;
+		this.cursorSpeed = 2;
+		this.tickCount = 0;
 
 	}
 
@@ -407,8 +410,9 @@ class TextBox extends Component {
 
 	tick(){
 		if(TICKS_PER_SECOND / this.cursorSpeed < this.tickCount){
-			this.cursorShape.visible = !this.cursorShape.visible;
-			this.cursorShape.flagForRender();
+			// this.cursorShape.visible = !this.cursorShape.visible;
+			this.flagForRender();
+			this.tickCount = 0;
 		}
 		this.tickCount++;
 	}
@@ -478,6 +482,12 @@ class Container extends Component {
 
 	keyPressed() {}
 	keyReleased() {}
+
+	tick(){
+		for(let c of this.comps) {
+			c.tick();
+		}
+	}
 
 }
 
@@ -829,6 +839,11 @@ class Panel extends Component {
 		if(this.layout != undefined && y > this.layout.y) {
 			this.layout.mouseReleased(x - this.layout.x, y - this.layout.y);
 		}
+	}
+
+	tick(){
+		if(this.layout != undefined)
+			this.layout.tick();
 	}
 
 }
