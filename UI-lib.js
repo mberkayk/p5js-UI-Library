@@ -91,6 +91,12 @@ class Text extends Shape {
 		this.width = textWidth(this.text);
 	}
 
+	getWidth(){
+		textSize(this.height);
+		this.width = textWidth(String(text));
+		return this.width;
+	}
+
 }
 
 class SVGraphics {
@@ -176,7 +182,7 @@ class Component {
 		this.setPos(x, y);
 		this.setSize(w, h);
 
-		this.inFocus = true;
+		this.inFocus = false;
 
 	}
 
@@ -371,7 +377,7 @@ class TextBox extends Component {
 	constructor(defaultText, w, h){
 		super(0, 0, w, h);
 
-		this.inFocus = false;
+		this.defaultText = defaultText;
 
 		this.boxShape = new Rect(this.x, this.y, this.width, this.height);
 		this.boxShape.fillColor = color(255);
@@ -382,8 +388,9 @@ class TextBox extends Component {
 		this.textShape.fillColor = color(120);
 
 		this.cursorShape = new Line(this.textShape.width,2,this.textShape.width,this.height-2);
-		this.cursorShape.strokeColor = color(120, 120, 120);
+		this.cursorShape.strokeColor = color(0);
 		this.cursorShape.strokeWeight = 1;
+		this.cursorShape.visible = false;
 
 		this.svg.add(this.boxShape);
 		this.svg.add(this.textShape);
@@ -394,9 +401,18 @@ class TextBox extends Component {
 
 	}
 
+	calculateCursorPos(){
+		this.cursorShape.x = this.textShape.getWidth();
+		this.cursorShape.x1 = this.textShape.getWidth();
+	}
+
 	mousePressed(){
 		if(this.inFocus == false){
 			this.inFocus = true;
+			if(this.textShape.text == this.defaultText){
+				this.textShape.text = '';
+				this.calculateCursorPos();
+			}
 		}else{
 			this.calculateCursorPos();
 		}
@@ -409,12 +425,15 @@ class TextBox extends Component {
 	}
 
 	tick(){
+		if(this.inFocus == false) return;
+
 		if(TICKS_PER_SECOND / this.cursorSpeed < this.tickCount){
 			this.cursorShape.visible = !this.cursorShape.visible;
 			this.flagForRender();
 			this.tickCount = 0;
 		}
 		this.tickCount++;
+
 	}
 }
 
