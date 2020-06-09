@@ -57,7 +57,8 @@ class Line extends Shape {
 	constructor(x, y, x1, y1){
 		super(x, y);
 		this.x1 = x1;
-		this.y = y1;
+		this.y1 = y1;
+		this.type = 'line';
 	}
 }
 
@@ -128,6 +129,7 @@ class SVGraphics {
 			g.ellipse(e.x, e.y, e.width, e.height);
 		}else if(e.type == 'line'){
 			g.line(e.x, e.y, e.x1, e.y1);
+			print("line rendered");
 		}else if(e.type == 'text'){
 			g.textSize(e.height);
 			g.textAlign(e.alignH, e.alignV);
@@ -379,11 +381,9 @@ class TextBox extends Component {
 		this.textShape = new Text(defaultText, this.x, this.y, this.height - 2);
 		this.textShape.fillColor = color(120);
 
-
-		print("text shape width: " + this.textShape.width);
 		this.cursorShape = new Line(this.textShape.width,2,this.textShape.width,this.height-2);
-		this.cursorShape.strokeColor = color(255, 0, 0);
-		this.cursorShape.strokeWeight = 5;
+		this.cursorShape.strokeColor = color(120, 120, 120);
+		this.cursorShape.strokeWeight = 1;
 
 		this.svg.add(this.boxShape);
 		this.svg.add(this.textShape);
@@ -410,7 +410,7 @@ class TextBox extends Component {
 
 	tick(){
 		if(TICKS_PER_SECOND / this.cursorSpeed < this.tickCount){
-			// this.cursorShape.visible = !this.cursorShape.visible;
+			this.cursorShape.visible = !this.cursorShape.visible;
 			this.flagForRender();
 			this.tickCount = 0;
 		}
