@@ -25,7 +25,7 @@ function setup() {
 
 	p0.addItem(new Label(p0.titleBar.height, 30));
 	p0.addItem(new Label(p1.titleBar.height, 30));
-	p0.addItem(new TextBox("Enter your name", 200, 30));
+	p0.addItem(new TextBox("Enter your name", 200, 20));
 
 	p1.layout.setPadding(0, 50);
 	p1.addItem(new Label('This panel\ndoesn\'t have a\ntitle bar', 14));
