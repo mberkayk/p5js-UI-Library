@@ -200,7 +200,7 @@ class Component {
 	keyPressed() {}
 	keyReleased() {}
 
-	tick(frame){}
+	tick(){}
 
 }
 
@@ -371,7 +371,7 @@ class TextBox extends Component {
 		this.boxShape.strokeColor = color(0);
 
 		this.textShape = new Text(defaultText, this.x, this.y, this.height - 2);
-		this.textShape.fillColor = color(100);
+		this.textShape.fillColor = color(120);
 
 
 		this.cursorShape = new Line(this.textShape.width,2,this.textShape.width,this.height-2);
@@ -860,7 +860,7 @@ class MainPanel extends Panel {
 
 		this.preMousePressed = mouseIsPressed;
 
-		this.tick(frameCount);
+		this.tick();
 
 
 		this.render(g);
@@ -879,9 +879,11 @@ class MainPanel extends Panel {
 		}
 	}
 
-	tick(frame){
-		for(let c of this.layout.comps) {
-			c.tick(frame);
+	tick(){
+		if(frameRate() / this.framesSinceLastTick <= 20){
+			for(let c of this.layout.comps) {
+				c.tick();
+			}
 		}
 	}
 
