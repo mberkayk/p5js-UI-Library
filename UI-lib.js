@@ -200,6 +200,8 @@ class Component {
 	keyPressed() {}
 	keyReleased() {}
 
+	tick(frame){}
+
 }
 
 class Label extends Component {
@@ -858,6 +860,8 @@ class MainPanel extends Panel {
 
 		this.preMousePressed = mouseIsPressed;
 
+		this.tick(frameCount);
+
 
 		this.render(g);
 
@@ -872,6 +876,12 @@ class MainPanel extends Panel {
 	keyReleased() {
 		for(let c of this.layout.comps) {
 			if(c.inFocus) c.keyReleased();
+		}
+	}
+
+	tick(frame){
+		for(let c of this.layout.comps) {
+			c.tick(frame);
 		}
 	}
 
