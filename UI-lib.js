@@ -1,3 +1,5 @@
+TICKS_PER_SECOND = 20;
+
 class Shape {
 	constructor(x, y){
 		this.x = x;
@@ -10,6 +12,8 @@ class Shape {
 		this.type;
 
 		this.flaggedForRender = true;
+
+		this.visible = true;
 	}
 
 	translate(x, y){
@@ -110,6 +114,7 @@ class SVGraphics {
 	}
 
 	renderElement(g, e){
+		if(e.visible == false) return;
 		g.push();
 		g.fill(e.fillColor);
 		g.strokeWeight(e.strokeWeight);
@@ -380,7 +385,9 @@ class TextBox extends Component {
 
 		this.svg.add(this.boxShape);
 		this.svg.add(this.textShape);
-		this.svg.add(this.cursorShape)
+		this.svg.add(this.cursorShape);
+
+		this.cursorSpeed = 3;
 
 	}
 
@@ -399,7 +406,11 @@ class TextBox extends Component {
 	}
 
 	tick(){
-		if(this.cursorSpeed)
+		if(TICKS_PER_SECOND / this.cursorSpeed < this.tickCount){
+			this.cursorShape.visible = !this.cursorShape.visible;
+			this.cursorShape.flagForRender();
+		}
+		this.tickCount++;
 	}
 }
 
@@ -831,7 +842,7 @@ class MainPanel extends Panel {
 
 		this.bgShape.fillColor = color(20, 23, 30);
 		this.preMousePressed = false;
-		
+
 		this.framesSinceLastTick = 0;
 	}
 
@@ -868,7 +879,6 @@ class MainPanel extends Panel {
 
 		this.tick();
 
-
 		this.render(g);
 
 	}
@@ -886,7 +896,7 @@ class MainPanel extends Panel {
 	}
 
 	tick(){
-		if(frameRate() / this.framesSinceLastTick <= 20){
+		if(frameRate() / this.framesSinceLastTick <= TICKS_PER_SECOND){
 			for(let c of this.layout.comps) {
 				c.tick();
 				this.framesSinceLastTick = 0;
