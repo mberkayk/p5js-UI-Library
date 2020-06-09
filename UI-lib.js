@@ -93,7 +93,7 @@ class Text extends Shape {
 
 	getWidth(){
 		textSize(this.height);
-		this.width = textWidth(String(text));
+		this.width = textWidth(String(this.text));
 		return this.width;
 	}
 
@@ -135,7 +135,6 @@ class SVGraphics {
 			g.ellipse(e.x, e.y, e.width, e.height);
 		}else if(e.type == 'line'){
 			g.line(e.x, e.y, e.x1, e.y1);
-			print("line rendered");
 		}else if(e.type == 'text'){
 			g.textSize(e.height);
 			g.textAlign(e.alignH, e.alignV);
@@ -208,13 +207,16 @@ class Component {
 	mouseMoved(x, y, px, py) {}
 	mouseExited(x, y, px, py){}
 	mouseDragged(x, y, px, py) {}
-	mousePressed(x, y) {}
+	mousePressed(x, y) {
+		this.inFocus = true;
+	}
 	mouseReleased(x, y) {}
+
 	keyPressed() {}
+	keyTyped(){}
 	keyReleased() {}
 
 	tick(){}
-
 }
 
 class Label extends Component {
@@ -342,6 +344,7 @@ class Button extends Component {
 	}
 
 	mousePressed(x, y) {
+		super.mousePressed();
 		this.pressing = true;
 		this.flagForRender();
 		this.on_press();
@@ -402,8 +405,10 @@ class TextBox extends Component {
 	}
 
 	calculateCursorPos(){
-		this.cursorShape.x = this.textShape.getWidth();
-		this.cursorShape.x1 = this.textShape.getWidth();
+		let w = this.textShape.getWidth();
+		if(w == 0) w = 3;
+		this.cursorShape.x = w;
+		this.cursorShape.x1 = w;
 	}
 
 	mousePressed(){
@@ -420,8 +425,10 @@ class TextBox extends Component {
 		this.flagForRender();
 	}
 
-	keyPressed(key){
+	keyTyped(){
 		this.textShape.text += key;
+		this.calculateCursorPos();
+		this.flagForRender();
 	}
 
 	tick(){
@@ -483,6 +490,7 @@ class Container extends Component {
 		}
 	}
 	mousePressed(x, y) {
+		super.mousePressed();
 		for(let c of this.comps){
 			if(c.x <= x && c.x + c.width > x
 				&& c.y <= y && c.y + c.height > y){
@@ -499,8 +507,22 @@ class Container extends Component {
 		}
 	}
 
-	keyPressed() {}
-	keyReleased() {}
+	keyPressed() {
+		for(let c of this.comps) {
+			if(c.inFocus == true) c.keyPressed();
+		}
+	}
+
+	keyTyped(){
+		for(let c of this.comps) {
+			if(c.inFocus == true) c.keyTyped();
+		}
+	}
+	keyReleased() {
+		for(let c of this.comps) {
+			if(c.inFocus == true) c.keyPressed();
+		}
+	}
 
 	tick(){
 		for(let c of this.comps) {
@@ -849,6 +871,7 @@ class Panel extends Component {
 	}
 
 	mousePressed(x, y) {
+		super.mousePressed();
 		if(this.layout != undefined && y > this.layout.y) {
 			this.layout.mousePressed(x - this.layout.x, y - this.layout.y);
 		}
@@ -863,6 +886,18 @@ class Panel extends Component {
 	tick(){
 		if(this.layout != undefined)
 			this.layout.tick();
+	}
+
+	keyPressed() {
+		this.layout.keyPressed();
+	}
+
+	keyTyped() {
+		this.layout.keyTyped();
+	}
+
+	keyReleased() {
+		this.layout.keyReleased();
 	}
 
 }
@@ -915,18 +950,6 @@ class MainPanel extends Panel {
 
 		this.render(g);
 
-	}
-
-	keyPressed() {
-		for(let c of this.layout.comps) {
-			if(c.inFocus) c.keyPressed();
-		}
-	}
-
-	keyReleased() {
-		for(let c of this.layout.comps) {
-			if(c.inFocus) c.keyReleased();
-		}
 	}
 
 	tick(){

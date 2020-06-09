@@ -9,7 +9,7 @@ let p2;
 
 function setup() {
 	createCanvas(600, 600);
-	frameRate(500);
+	frameRate(30);
 
 	gr = createGraphics(width, height);
 	mainPanel = new MainPanel(width, height);
@@ -67,6 +67,10 @@ function setup() {
 function draw() {
 	mainPanel.loop(gr);
 	image(gr, 0, 0);
+}
+
+function keyTyped(){
+	mainPanel.keyTyped();
 }
 
 function windowResized() {
