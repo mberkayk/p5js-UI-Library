@@ -397,6 +397,10 @@ class TextBox extends Component {
 	keyPressed(key){
 		this.textShape.text += key;
 	}
+
+	tick(){
+		if(this.cursorSpeed)
+	}
 }
 
 class Container extends Component {
@@ -827,6 +831,8 @@ class MainPanel extends Panel {
 
 		this.bgShape.fillColor = color(20, 23, 30);
 		this.preMousePressed = false;
+		
+		this.framesSinceLastTick = 0;
 	}
 
 	addItem(item){
@@ -883,8 +889,10 @@ class MainPanel extends Panel {
 		if(frameRate() / this.framesSinceLastTick <= 20){
 			for(let c of this.layout.comps) {
 				c.tick();
+				this.framesSinceLastTick = 0;
 			}
 		}
+		this.framesSinceLastTick++;
 	}
 
 	render(g){
